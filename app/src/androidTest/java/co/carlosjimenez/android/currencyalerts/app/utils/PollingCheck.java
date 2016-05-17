@@ -22,48 +22,59 @@
  * THE SOFTWARE.
  */
 
-apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
+package co.carlosjimenez.android.currencyalerts.app.utils;
 
-buildscript {
-    repositories {
-        mavenCentral()
+import junit.framework.Assert;
+
+import java.util.concurrent.Callable;
+
+public abstract class PollingCheck {
+    private static final long TIME_SLICE = 50;
+    private long mTimeout = 3000;
+
+    public PollingCheck() {
     }
 
-    dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+    public PollingCheck(long timeout) {
+        mTimeout = timeout;
     }
-}
 
-android {
-    compileSdkVersion 23
-    buildToolsVersion "24.0.0 rc2"
+    public static void check(CharSequence message, long timeout, Callable<Boolean> condition)
+            throws Exception {
+        while (timeout > 0) {
+            if (condition.call()) {
+                return;
+            }
 
-    defaultConfig {
-        applicationId "co.carlosjimenez.android.currencyalerts.app"
-        minSdkVersion 21
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            Thread.sleep(TIME_SLICE);
+            timeout -= TIME_SLICE;
         }
+
+        Assert.fail(message.toString());
     }
-}
 
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile 'com.github.bumptech.glide:glide:3.5.2'
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
-    compile 'com.android.support:gridlayout-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:support-annotations:23.4.0'
+    protected abstract boolean check();
 
-    compile 'com.jakewharton:butterknife:8.0.1'
-    apt 'com.jakewharton:butterknife-compiler:8.0.1'
+    public void run() {
+        if (check()) {
+            return;
+        }
+
+        long timeout = mTimeout;
+        while (timeout > 0) {
+            try {
+                Thread.sleep(TIME_SLICE);
+            } catch (InterruptedException e) {
+                Assert.fail("unexpected InterruptedException");
+            }
+
+            if (check()) {
+                return;
+            }
+
+            timeout -= TIME_SLICE;
+        }
+
+        Assert.fail("unexpected timeout");
+    }
 }

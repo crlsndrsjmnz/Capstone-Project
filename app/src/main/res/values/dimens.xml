@@ -1,6 +1,47 @@
+<!--
+  ~ The MIT License (MIT)
+  ~
+  ~ Copyright (c) 2016 Carlos Andres Jimenez <apps@carlosandresjimenez.co>
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="main_view_height">200dp</dimen>
+
+    <dimen name="main_icon">96dp</dimen>
+    <dimen name="detail_icon">72dp</dimen>
+    <dimen name="list_icon">40dp</dimen>
+
+    <dimen name="rate_detail_horizontal_padding">32dp</dimen>
+
+    <dimen name="rate_text_width">160dp</dimen>
+
+    <!-- Text Sizes - We are using DP here rather than SP because these are already large
+     font sizes, and going larger will cause lots of view problems.  This is only for
+     the large forecast numbers in the forecast list -->
+    <dimen name="rate_text_size">35sp</dimen>
+
+    <dimen name="size_fab">56dp</dimen>
+
+    <dimen name="spacing_double">16dp</dimen>
+
 </resources>
