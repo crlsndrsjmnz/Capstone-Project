@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    public static final String MAIN_FRAGMENT_TAG = "MAIN_FRAGMENT";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             MainActivityFragment fragment = new MainActivityFragment();
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.flMain, fragment)
+                    .add(R.id.flMain, fragment, MAIN_FRAGMENT_TAG)
                     .commit();
         }
     }
@@ -56,5 +58,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
                 .setData(rateUri);
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onSettingsSelected() {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 }

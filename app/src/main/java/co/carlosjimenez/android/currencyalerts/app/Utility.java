@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.RectF;
 import android.preference.PreferenceManager;
+import android.text.format.Time;
 
 import java.text.SimpleDateFormat;
 
@@ -37,8 +38,10 @@ import co.carlosjimenez.android.currencyalerts.app.sync.LoadCurrencyTask;
 
 public class Utility {
 
-    public static final String DATE_FORMAT = "yyyy/MM/dd HH:mm";
     private static final String LOG_TAG = Utility.class.getSimpleName();
+
+    public static final String DATE_FORMAT = "yyyy/MM/dd";
+    public static final String DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     /**
      * @param c Context used to get the SharedPreferences
@@ -68,15 +71,61 @@ public class Utility {
      * @param c Context used to get the SharedPreferences
      * @return the forex sync status integer type
      */
+    static public int getSyncFrequency(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        return sp.getInt(c.getString(R.string.pref_sync_frequency_default), Integer.parseInt(c.getString(R.string.pref_sync_frequency_default)));
+    }
+
+    /**
+     * @param c Context used to get the SharedPreferences
+     * @return the forex sync status integer type
+     */
+    static public long getForexSyncDate(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        long syncTime = sp.getLong(c.getString(R.string.pref_forex_sync_date_key), 0);
+
+        Time dayTime = new Time();
+        dayTime.setToNow();
+
+        // we start at the day returned by local time. Otherwise this is a mess.
+        int julianDate = Time.getJulianDay(syncTime, dayTime.gmtoff);
+
+        // now we work exclusively in UTC
+        dayTime = new Time();
+        return dayTime.setJulianDay(julianDate);
+    }
+
+    /**
+     * @param c Context used to get the SharedPreferences
+     * @return the forex sync status integer type
+     */
+    static public long getForexSyncDateTime(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        return sp.getLong(c.getString(R.string.pref_forex_sync_date_key), 0);
+    }
+
+    /**
+     * @param c Context used to get the SharedPreferences
+     * @return the forex sync status integer type
+     */
+    static public String getSyncCurrencies(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        return sp.getString(c.getString(R.string.pref_displayed_currencies_key), "");
+    }
+
+    /**
+     * @param c Context used to get the SharedPreferences
+     * @return the forex sync status integer type
+     */
     static public Currency getMainCurrency(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
         return new Currency(
-                sp.getString(c.getString(R.string.pref_main_currency_id_key), c.getString(R.string.us_currency_id)),
-                sp.getString(c.getString(R.string.pref_main_currency_name_key), c.getString(R.string.us_currency_name)),
-                sp.getString(c.getString(R.string.pref_main_currency_symbol_key), c.getString(R.string.us_currency_symbol)),
-                sp.getString(c.getString(R.string.pref_main_country_code_key), c.getString(R.string.us_country_code)),
-                sp.getString(c.getString(R.string.pref_main_country_name_key), c.getString(R.string.us_country_name)),
-                sp.getString(c.getString(R.string.pref_main_country_flag_key), c.getString(R.string.us_country_flag)));
+                sp.getString(c.getString(R.string.pref_main_currency_id_key), c.getString(R.string.pref_cu_id_us)),
+                sp.getString(c.getString(R.string.pref_main_currency_name_key), c.getString(R.string.pref_cu_name_us)),
+                sp.getString(c.getString(R.string.pref_main_currency_symbol_key), c.getString(R.string.pref_cu_symbol_us)),
+                sp.getString(c.getString(R.string.pref_main_country_code_key), c.getString(R.string.pref_co_code_us)),
+                sp.getString(c.getString(R.string.pref_main_country_name_key), c.getString(R.string.pref_co_name_us)),
+                sp.getString(c.getString(R.string.pref_main_country_flag_key), c.getString(R.string.pref_co_flag_us)));
     }
 
     /**
@@ -89,6 +138,19 @@ public class Utility {
      */
     public static String getDateString(Context context, long dateInMillis) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(Utility.DATE_FORMAT);
+        return dateFormat.format(dateInMillis);
+    }
+
+    /**
+     * Helper method to convert the database representation of the date into something to display
+     * to users.  As classy and polished a user experience as "20140102" is, we can do better.
+     *
+     * @param context      Context to use for resource localization
+     * @param dateInMillis The date in milliseconds
+     * @return a user-friendly representation of the date.
+     */
+    public static String getDateTimeString(Context context, long dateInMillis) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Utility.DATETIME_FORMAT);
         return dateFormat.format(dateInMillis);
     }
 

@@ -21,7 +21,6 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="co.carlosjimenez.android.currencyalerts.app">
 
@@ -48,6 +47,24 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".DetailActivity"
+            android:label="@string/title_activity_detail"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.Details">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="co.carlosjimenez.android.currencyalerts.app.MainActivity" />
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/SettingsTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="co.carlosjimenez.android.currencyalerts.app.MainActivity" />
         </activity>
 
         <provider
@@ -80,16 +97,6 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
-        <activity
-            android:name=".DetailActivity"
-            android:label="@string/title_activity_detail"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.Details">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="co.carlosjimenez.android.currencyalerts.app.MainActivity" />
-        </activity>
     </application>
-
 
 </manifest>

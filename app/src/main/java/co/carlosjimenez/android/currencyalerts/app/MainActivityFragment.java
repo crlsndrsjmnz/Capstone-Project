@@ -53,7 +53,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -69,6 +69,7 @@ import co.carlosjimenez.android.currencyalerts.app.widget.CurrencyEditText;
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+
     // These indices are tied to FOREX_COLUMNS.  If FOREX_COLUMNS changes, these
     // must change.
     static final int COL_RATE_ID = 0;
@@ -86,21 +87,26 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     static final int COL_COUNTRY_TO_FLAG = 12;
     static final int COL_RATE_DATE = 13;
     static final int COL_RATE_VAL = 14;
+
     private static final int FOREX_LOADER = 0;
+
     @BindView(R.id.currencyFromAmount)
     CurrencyEditText mCurrencyEditText;
     @BindView(R.id.clMain)
     CoordinatorLayout mCoordinatorLayout;
     @BindView(R.id.topPanel)
-    LinearLayout mLinearLayout;
+    RelativeLayout mRelativeLayout;
     @BindView(R.id.recyclerview_forex)
     RecyclerView mRecyclerView;
     @BindView(R.id.currencyFromDescription)
     TextView mCurrencyDescription;
-    @BindView(R.id.currencyFromFlag)
-    ImageView mImageView;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.currencyFromFlag)
+    ImageView mImageView;
+    @BindView(R.id.header_cover)
+    ImageView mCoverImageView;
+
     private AppCompatActivity mContext;
     private FloatingActionButton mCalculateButton;
     private ForexAdapter mForexAdapter;
@@ -108,6 +114,26 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     public MainActivityFragment() {
         setHasOptionsMenu(true);
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * MainActivityFragment Callback to perform an action on the activity when an item
+         * has been selected.
+         */
+        void onItemSelected(Uri rateUri);
+        void onSettingsSelected();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
@@ -137,7 +163,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             public void onClick(String currencyId, ForexAdapter.ForexAdapterViewHolder vh) {
                 String[] currencies = {mMainCurrency.getId(), currencyId};
 
-                ((Callback) getActivity()).onItemSelected(ForexContract.RateEntry.buildCurrencyRate(currencies));
+                double value = Double.parseDouble(mCurrencyEditText.getText().toString());
+                ((Callback) getActivity()).onItemSelected(ForexContract.RateEntry.buildCurrencyRateWithValue(currencies, value));
             }
         });
 
@@ -197,6 +224,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            ((Callback) getActivity()).onSettingsSelected();
             return true;
         } else if (id == R.id.action_refresh) {
             refresh();
@@ -215,12 +243,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // dates after or including today.
 
         // Sort order:  Ascending, by date.
-//        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
-
-//        String locationSetting = Utility.getPreferredLocation(getActivity());
         Uri rateUri = ForexContract.RateEntry.buildStartCurrencyWithDate(
                 mMainCurrency.getId(),
-                System.currentTimeMillis());
+                Utility.getForexSyncDate(mContext));
 
         return new CursorLoader(getActivity(),
                 rateUri,
@@ -241,7 +266,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             Log.e(LOG_TAG, "No data returned");
         } else {
             for (int i = 0; i < data.getCount(); i++) {
-                //printData(data, i);
                 data.moveToPosition(i);
                 rateString = Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), data.getDouble(COL_RATE_VAL));
 
@@ -282,6 +306,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             }
         });
 
+//        Glide.with(this)
+//                .load("http://processflows.co.uk/wp-content/blogs.dir/1/files/2013/05/finance.jpg")
+//                .error(R.drawable.generic)
+//                .crossFade()
+//                .centerCrop()
+//                .into(mCoverImageView);
+
         Glide.with(this)
                 .load(mMainCurrency.getCountryFlag())
                 .error(R.drawable.generic)
@@ -291,62 +322,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mCurrencyDescription.setText(mMainCurrency.getName());
     }
 
-    public void printData(Cursor data, int i) {
-        String currency_from_id = "";
-        String currency_from_name = "";
-        String currency_from_symbol = "";
-        String country_from_name = "";
-        String country_from_code = "";
-        String country_from_flag = "";
-        String currency_to_id = "";
-        String currency_to_name = "";
-        String currency_to_symbol = "";
-        String country_to_name = "";
-        String country_to_code = "";
-        String country_to_flag = "";
-        long dateTime = 0;
-        double rate = 0;
-
-        data.moveToPosition(i);
-
-        currency_from_id = data.getString(COL_CURRENCY_FROM_ID);
-        currency_from_name = data.getString(COL_CURRENCY_FROM_NAME);
-        currency_from_symbol = data.getString(COL_CURRENCY_FROM_SYMBOL);
-        country_from_code = data.getString(COL_COUNTRY_FROM_CODE);
-        country_from_name = data.getString(COL_COUNTRY_FROM_NAME);
-        country_from_flag = data.getString(COL_COUNTRY_FROM_FLAG);
-        currency_to_id = data.getString(COL_CURRENCY_TO_ID);
-        currency_to_name = data.getString(COL_CURRENCY_TO_NAME);
-        currency_to_symbol = data.getString(COL_CURRENCY_TO_SYMBOL);
-        country_to_code = data.getString(COL_COUNTRY_TO_CODE);
-        country_to_name = data.getString(COL_COUNTRY_TO_NAME);
-        country_to_flag = data.getString(COL_COUNTRY_TO_FLAG);
-        dateTime = data.getLong(COL_RATE_DATE);
-        rate = data.getDouble(COL_RATE_VAL);
-
-        Log.d(LOG_TAG, "************* onLoadFinished: \n" +
-                " currency_from_id " + currency_from_id + "\n" +
-                " currency_from_name " + currency_from_name + "\n" +
-                " currency_from_symbol " + currency_from_symbol + "\n" +
-                " country_from_code " + country_from_code + "\n" +
-                " country_from_name " + country_from_name + "\n" +
-                " country_from_flag " + country_from_flag + "\n" +
-                " currency_to_id " + currency_to_id + "\n" +
-                " currency_to_name " + currency_to_name + "\n" +
-                " currency_to_symbol " + currency_to_symbol + "\n" +
-                " country_to_code " + country_to_code + "\n" +
-                " country_to_name " + country_to_name + "\n" +
-                " country_to_flag " + country_to_flag + "\n" +
-                " dateTime " + dateTime + "\n" +
-                " rate " + rate);
-
-    }
-
     private void addFloatingActionButton() {
         final int fabSize = getResources().getDimensionPixelSize(R.dimen.size_fab);
         final int spacingDouble = getResources().getDimensionPixelSize(R.dimen.spacing_double);
 
-        int bottomOfQuestionView = mLinearLayout.getBottom();
+        int bottomOfQuestionView = mRelativeLayout.getBottom();
         int bottomOfToolbar = mToolbar.getBottom();
 
         final CoordinatorLayout.LayoutParams fabLayoutParams = new CoordinatorLayout.LayoutParams(fabSize, fabSize);
@@ -396,17 +376,5 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             view = new View(mContext);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of item
-     * selections.
-     */
-    public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
-        void onItemSelected(Uri rateUri);
     }
 }

@@ -27,7 +27,7 @@
 
     <dimen name="main_view_height">200dp</dimen>
 
-    <dimen name="main_icon">96dp</dimen>
+    <dimen name="main_icon">120dp</dimen>
     <dimen name="detail_icon">72dp</dimen>
     <dimen name="list_icon">40dp</dimen>
 
@@ -42,6 +42,12 @@
 
     <dimen name="size_fab">56dp</dimen>
 
+    <dimen name="spacing_nano">2dp</dimen>
+    <dimen name="spacing_micro">4dp</dimen>
+    <dimen name="spacing_normal">8dp</dimen>
     <dimen name="spacing_double">16dp</dimen>
+    <dimen name="spacing_huge">72dp</dimen>
+
+    <dimen name="appbar_elevation">4dp</dimen>
 
 </resources>

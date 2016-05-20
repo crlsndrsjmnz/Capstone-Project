@@ -36,14 +36,17 @@ import android.net.Uri;
 public class ForexProvider extends ContentProvider {
 
     public static final String LOG_TAG = ForexProvider.class.getSimpleName();
+
     static final int RATE = 100;
     static final int RATE_WITH_CURRENCY = 101;
     static final int RATE_ALL_WITH_CURRENCY = 102;
     static final int RATE_WITH_CURRENCY_AND_DATE = 103;
     static final int CURRENCY = 300;
+
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder sRateByCurrencyQueryBuilder;
+
     //currency_from_id = ? AND currency_to_id = ?
     private static final String sCurrencySelection =
             ForexContract.RateEntry.TABLE_NAME + "." +
@@ -99,12 +102,6 @@ public class ForexProvider extends ContentProvider {
 
     private ForexDbHelper mOpenHelper;
 
-    /*
-        Students: Here is where you need to create the UriMatcher. This UriMatcher will
-        match each URI to the WEATHER, WEATHER_WITH_LOCATION, WEATHER_WITH_LOCATION_AND_DATE,
-        and LOCATION integer constants defined above.  You can test this by uncommenting the
-        testUriMatcher test within TestUriMatcher.
-     */
     static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
         // expressions instead?  Because you're not crazy, that's why.
@@ -200,11 +197,6 @@ public class ForexProvider extends ContentProvider {
         return true;
     }
 
-    /*
-        Students: Here's where you'll code the getType function that uses the UriMatcher.  You can
-        test this by uncommenting testGetType in TestProvider.
-
-     */
     @Override
     public String getType(Uri uri) {
 
@@ -234,9 +226,6 @@ public class ForexProvider extends ContentProvider {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
         Cursor retCursor;
-
-        String uriLog = uri != null ? uri.toString() : "";
-        String selectionLog = selection != null ? selection.toString() : "";
 
         switch (sUriMatcher.match(uri)) {
             // "rate/*/*/*"

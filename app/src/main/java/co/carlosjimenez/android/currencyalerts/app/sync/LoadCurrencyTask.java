@@ -28,6 +28,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,15 +42,23 @@ import java.util.Vector;
 
 import co.carlosjimenez.android.currencyalerts.app.R;
 import co.carlosjimenez.android.currencyalerts.app.Utility;
+import co.carlosjimenez.android.currencyalerts.app.data.Currency;
 import co.carlosjimenez.android.currencyalerts.app.data.ForexContract;
 
 public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
 
+    private static final String LOG_TAG = LoadCurrencyTask.class.getSimpleName();
+
     public static final int CURRENCY_STATUS_OK = 0;
     public static final int CURRENCY_STATUS_UNKNOWN = 1;
     public static final int CURRENCY_STATUS_INVALID = 2;
-    private final String LOG_TAG = LoadCurrencyTask.class.getSimpleName();
+
     private final Context mContext;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({CURRENCY_STATUS_OK, CURRENCY_STATUS_UNKNOWN, CURRENCY_STATUS_INVALID})
+    public @interface CurrencyStatus {
+    }
 
     public LoadCurrencyTask(Context context) {
         mContext = context;
@@ -60,12 +69,26 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
      * the UI thread because it uses commit to write to the shared preferences.
      *
      * @param c              Context to get the PreferenceManager from.
-     * @param currencyStatus The IntDef value to set
+     * @param currencyStatus The value to set
      */
     static private void setCurrencyStatus(Context c, @CurrencyStatus int currencyStatus) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor spe = sp.edit();
         spe.putInt(c.getString(R.string.pref_currency_status_key), currencyStatus);
+        spe.commit();
+    }
+
+    /**
+     * Sets the forex status into shared preference.  This function should not be called from
+     * the UI thread because it uses commit to write to the shared preferences.
+     *
+     * @param c              Context to get the PreferenceManager from.
+     * @param currencies     The value to set
+     */
+    static private void setSyncCurrencies(Context c, String currencies) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putString(c.getString(R.string.pref_displayed_currencies_key), currencies);
         spe.commit();
     }
 
@@ -81,9 +104,21 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
         Vector<ContentValues> cVVector = getCurrencies();
         long currencyRowId;
         int i = 0;
+        String currencies = "";
+        String currencyId = "";
+        Currency mainCurrency = Utility.getMainCurrency(mContext);
 
         try {
             for (ContentValues currencyValue : cVVector) {
+
+                currencyId = currencyValue.getAsString(ForexContract.CurrencyEntry.COLUMN_CURRENCY_ID);
+                if (!currencyId.equals(mainCurrency.getId())) {
+                    if (currencies.length() > 1)
+                        currencies = currencies + "," + mainCurrency.getId() + "_" + currencyId;
+                    else
+                        currencies = mainCurrency.getId() + "_" + currencyId;
+                }
+
                 currencyRowId = addCurrency(currencyValue);
                 i++;
             }
@@ -92,7 +127,11 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
         }
 
         setCurrencyStatus(mContext, CURRENCY_STATUS_OK);
+        setSyncCurrencies(mContext, currencies);
+
         Log.d(LOG_TAG, "Inserted currencies : " + i);
+        ForexSyncAdapter.syncImmediately(mContext);
+
         return i;
     }
 
@@ -117,6 +156,14 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
         if (currencyCursor.moveToFirst()) {
             int currencyIdIndex = currencyCursor.getColumnIndex(ForexContract.CurrencyEntry._ID);
             currencyRowId = currencyCursor.getLong(currencyIdIndex);
+
+            int updatedRows = mContext.getContentResolver().update(
+                    ForexContract.CurrencyEntry.CONTENT_URI,
+                    currencyValue,
+                    ForexContract.CurrencyEntry._ID + " = ?",
+                    new String[]{String.valueOf(currencyRowId)}
+            );
+
         } else {
             // Now that the content provider is set up, inserting rows of data is pretty simple.
             // Insert currency data into the database
@@ -137,41 +184,26 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
     Vector<ContentValues> getCurrencies() {
 
         Vector<ContentValues> cVVector = new Vector<>();
-        ContentValues currencyValues = new ContentValues();
+        ContentValues currencyValues;
 
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_ID, "USD");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_SYMBOL, "$");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_NAME, "United States dollar");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_CODE, "US");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_NAME, "United States of America");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_FLAG_URL, "https://www.geoips.com//assets/img/flag/128h/us.png");
-        cVVector.add(currencyValues);
+        TypedArray country_code = mContext.getResources().obtainTypedArray(R.array.country_code);
+        TypedArray country_name = mContext.getResources().obtainTypedArray(R.array.country_name);
+        TypedArray country_flag_url = mContext.getResources().obtainTypedArray(R.array.country_flag_url);
+        TypedArray currency_id = mContext.getResources().obtainTypedArray(R.array.currency_id);
+        TypedArray currency_name = mContext.getResources().obtainTypedArray(R.array.currency_name);
+        TypedArray currency_symbol = mContext.getResources().obtainTypedArray(R.array.currency_symbol);
 
-        currencyValues = new ContentValues();
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_ID, "ZAR");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_NAME, "South African rand");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_SYMBOL, "R");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_CODE, "ZA");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_NAME, "South Africa");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_FLAG_URL, "https://www.geoips.com//assets/img/flag/128h/za.png");
-        cVVector.add(currencyValues);
-
-        currencyValues = new ContentValues();
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_ID, "COP");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_NAME, "Colombian peso");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_SYMBOL, "$");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_CODE, "CO");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_NAME, "Colombia");
-        currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_FLAG_URL, "https://www.geoips.com//assets/img/flag/128h/co.png");
-        cVVector.add(currencyValues);
+        for (int i = 0; i < country_code.length(); i++) {
+            currencyValues = new ContentValues();
+            currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_ID, currency_id.getString(i));
+            currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_SYMBOL, currency_symbol.getString(i));
+            currencyValues.put(ForexContract.CurrencyEntry.COLUMN_CURRENCY_NAME, currency_name.getString(i));
+            currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_CODE, country_code.getString(i));
+            currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_NAME, country_name.getString(i));
+            currencyValues.put(ForexContract.CurrencyEntry.COLUMN_COUNTRY_FLAG_URL, country_flag_url.getString(i));
+            cVVector.add(currencyValues);
+        }
 
         return cVVector;
     }
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({CURRENCY_STATUS_OK, CURRENCY_STATUS_UNKNOWN, CURRENCY_STATUS_INVALID})
-    public @interface CurrencyStatus {
-    }
-
-
 }

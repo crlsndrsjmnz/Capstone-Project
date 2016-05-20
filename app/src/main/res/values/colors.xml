@@ -28,7 +28,9 @@
     <color name="colorPrimary">#795548</color>
     <color name="colorPrimaryDark">#5D4037</color>
 
+    <color name="colorAccentLight">#A7FFEB</color>
     <color name="colorAccent">#64FFDA</color>
+    <color name="colorAccentDark">#1DE9B6</color>
 
     <color name="detail_accent_pane_background">#455A64</color>
     <color name="detail_accent_label">#90A4AE</color>
@@ -36,5 +38,10 @@
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
 
+    <color name="primary_text_main">#FFFFFF</color>
+    <color name="secondary_text_main">#BDBDBD</color>
+
     <color name="detail_toolbar_icon_color">#757575</color>
+
+    <color name="grey_900">#212121</color>
 </resources>

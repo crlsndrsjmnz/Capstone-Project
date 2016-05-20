@@ -33,6 +33,8 @@
         <item name="toolbarStyle">@style/Toolbar</item>
     </style>
 
+    <style name="SettingsTheme" parent="@style/AppTheme" />
+
     <style name="AppTheme.Details" parent="@style/AppTheme" />
 
     <style name="AppTheme.NoActionBar">

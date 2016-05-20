@@ -149,6 +149,14 @@ public class ForexContract {
                     .build();
         }
 
+        public static Uri buildCurrencyRateWithValue(String[] currencies, double value) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(currencies[0])
+                    .appendPath(currencies[1])
+                    .appendQueryParameter(COLUMN_RATE_VALUE, Double.toString(value))
+                    .build();
+        }
+
         public static Uri buildStartCurrencyRate(String[] currencies) {
             return CONTENT_URI.buildUpon()
                     .appendPath(currencies[0])
@@ -203,6 +211,14 @@ public class ForexContract {
                 return Long.parseLong(dateString);
             else
                 return 0;
+        }
+
+        public static double getRateFromUri(Uri uri) {
+            String rateString = uri.getQueryParameter(COLUMN_RATE_VALUE);
+            if (null != rateString && rateString.length() > 0)
+                return Double.parseDouble(rateString);
+            else
+                return 1;
         }
     }
 }

@@ -27,7 +27,6 @@ package co.carlosjimenez.android.currencyalerts.app.sync;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 public class ForexSyncService extends Service {
     private static final Object sSyncAdapterLock = new Object();
@@ -35,7 +34,7 @@ public class ForexSyncService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d("ForexSyncService", "onCreate - ForexSyncService");
+
         synchronized (sSyncAdapterLock) {
             if (sForexSyncAdapter == null) {
                 sForexSyncAdapter = new ForexSyncAdapter(getApplicationContext(), true);

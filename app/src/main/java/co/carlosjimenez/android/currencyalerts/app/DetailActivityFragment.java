@@ -24,6 +24,7 @@
 
 package co.carlosjimenez.android.currencyalerts.app;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -56,7 +57,10 @@ import co.carlosjimenez.android.currencyalerts.app.data.ForexContract;
  */
 public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
+
     static final String DETAIL_URI = "URI";
+
     // These indices are tied to FOREX_COLUMNS.  If FOREX_COLUMNS changes, these
     // must change.
     static final int COL_RATE_ID = 0;
@@ -74,9 +78,10 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     static final int COL_COUNTRY_TO_FLAG = 12;
     static final int COL_RATE_DATE = 13;
     static final int COL_RATE_VAL = 14;
-    private static final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
+
     private static final int DETAIL_LOADER = 0;
     private static final int DEFAULT_DAYS_FOREX_AVERAGE = 30;
+
     @BindView(R.id.detail_period_textview)
     TextView mTvPeriod;
     @BindView(R.id.detail_max_rate_textview)
@@ -99,8 +104,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     TextView mTvCurrencyToRate;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+
     private Uri mUri;
     private AppCompatActivity mContext;
+
+    private static final String FOREX_SHARE_HASHTAG = " #CurrencyRatesApp";
+
+    private String mDisplayedRate;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -114,6 +124,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         if (arguments != null) {
             mUri = arguments.getParcelable(DETAIL_URI);
         }
+
+        mContext = (AppCompatActivity) getActivity();
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, rootView);
@@ -138,8 +150,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         if (getActivity() instanceof DetailActivity) {
             // Inflate the menu; this adds items to the action bar if it is present.
             inflater.inflate(R.menu.detailfragment, menu);
-
-            MenuTint.colorMenuItem(menu.getItem(0), getResources().getColor(R.color.detail_toolbar_icon_color), null);
+            finishCreatingMenu(menu);
         }
     }
 
@@ -154,12 +165,26 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         if (id == R.id.action_alert) {
             Toast.makeText(mContext, "Alert", Toast.LENGTH_SHORT).show();
             return true;
-        } else if (id == R.id.action_share) {
-            Toast.makeText(mContext, "Share", Toast.LENGTH_SHORT).show();
-            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void finishCreatingMenu(Menu menu) {
+        // Retrieve the share menu item
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        menuItem.setIntent(createShareForecastIntent());
+
+        menuItem = menu.findItem(R.id.action_alert);
+        MenuTint.colorMenuItem(menuItem, getResources().getColor(R.color.detail_toolbar_icon_color), null);
+    }
+
+    private Intent createShareForecastIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mDisplayedRate + FOREX_SHARE_HASHTAG);
+        return shareIntent;
     }
 
     @Override
@@ -217,10 +242,19 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                 .crossFade()
                 .into(mIvFlagTo);
 
-        mTvCurrencyFromDesc.setText(data.getString(COL_CURRENCY_FROM_NAME));
-        mTvCurrencyFromRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_FROM_SYMBOL), 1));
-        mTvCurrencyToDesc.setText(data.getString(COL_CURRENCY_TO_NAME));
-        mTvCurrencyToRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), data.getDouble(COL_RATE_VAL)));
+        String currencyFromId = data.getString(COL_CURRENCY_FROM_ID);
+        String currencyFromName = data.getString(COL_CURRENCY_FROM_NAME);
+        String currencyFromSymbol = data.getString(COL_CURRENCY_FROM_SYMBOL);
+        double currencyFromRate = ForexContract.RateEntry.getRateFromUri(mUri);
+        mTvCurrencyFromDesc.setText(currencyFromName);
+        mTvCurrencyFromRate.setText(Utility.formatCurrencyRate(getActivity(), currencyFromSymbol, currencyFromRate));
+
+        String currencyToId = data.getString(COL_CURRENCY_TO_ID);
+        String currencyToName = data.getString(COL_CURRENCY_TO_NAME);
+        String currencyToSymbol = data.getString(COL_CURRENCY_TO_SYMBOL);
+        double currencyToRate = ForexContract.RateEntry.getRateFromUri(mUri) * data.getDouble(COL_RATE_VAL);
+        mTvCurrencyToDesc.setText(currencyToName);
+        mTvCurrencyToRate.setText(Utility.formatCurrencyRate(getActivity(), currencyToSymbol, currencyToRate));
 
         Time dayTime = new Time();
         dayTime.setToNow();
@@ -229,6 +263,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         dayTime = new Time();
         long lMinDate = dayTime.setJulianDay(julianDate - DEFAULT_DAYS_FOREX_AVERAGE);
+
+        sDate = Utility.getDateString(getActivity(), data.getLong(COL_RATE_DATE));
 
         for (i = 0; i < data.getCount() && i < DEFAULT_DAYS_FOREX_AVERAGE; i++) {
             data.moveToPosition(i);
@@ -253,14 +289,23 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         }
         dRateAverage = dRateAverage / i;
 
-        if (DEFAULT_DAYS_FOREX_AVERAGE > 1)
-            mTvPeriod.setText(DEFAULT_DAYS_FOREX_AVERAGE + " days");
+        if (data.getCount() > 1)
+            mTvPeriod.setText(data.getCount() + " days");
         else
-            mTvPeriod.setText(DEFAULT_DAYS_FOREX_AVERAGE + " day");
+            mTvPeriod.setText(data.getCount() + " day");
 
         mTvMaxRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), dMaxVal));
         mTvMinRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), dMinVal));
         mTvAverageRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), dRateAverage));
+
+        mDisplayedRate = String.format("%s - %s %s = %s %s", sDate, currencyFromRate, currencyFromId, currencyToRate, currencyToId);
+
+        if ( null != mToolbar ) {
+            Menu menu = mToolbar.getMenu();
+            if ( null != menu ) menu.clear();
+            mToolbar.inflateMenu(R.menu.detailfragment);
+            finishCreatingMenu(mToolbar.getMenu());
+        }
     }
 
     @Override

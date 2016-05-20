@@ -22,27 +22,11 @@
   ~ THE SOFTWARE.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="co.carlosjimenez.android.currencyalerts.app.MainActivityFragment"
-    tools:showIn="@layout/activity_main">
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
 
-    <include
-        layout="@layout/content_main_currency"
-        android:id="@+id/topPanel"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/main_view_height" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_forex"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/topPanel"
-        android:fitsSystemWindows="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-</RelativeLayout>
+    <gradient
+        android:angle="270"
+        android:startColor="@android:color/transparent"
+        android:endColor="@color/grey_900" />
+</shape>
