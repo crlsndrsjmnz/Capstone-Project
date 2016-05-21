@@ -39,50 +39,60 @@
     <string name="min_rate_label">Min Rate</string>
     <string name="average_rate_label">Average</string>
 
+    <!-- Empty Weather Database -->
+    <string name="empty_forex_list">No Rates Information Available</string>
+    <string name="empty_forex_list_no_network">No rates information available. The network is not available to fetch rates data.</string>
+    <string name="empty_forex_list_server_down">No rates information available. The server is not returning data.</string>
+    <string name="empty_forex_list_invalid">No rates information available. The server is returning invalid data.</string>
+    <string name="empty_forex_list_server_error">No rates information available. The server is not returning valid data. Please check for an updated version of Currency Rates.</string>
+
     <!-- Strings for formatting weather-related data -->
     <!-- Temperature format [CHAR LIMIT=5 -->
     <string name="format_currency_rate"><xliff:g id="prefix">%1$s</xliff:g> <xliff:g id="rate">%2$1.2f</xliff:g></string>
     <string name="title_activity_detail">DetailActivity</string>
 
+    <string name="detail_flag_from_transition_name" translatable="false">TN_DetailFragFrom</string>
+    <string name="detail_flag_to_transition_name" translatable="false">TN_DetailFlagTo</string>
+
     <!-- Strings with country and currency general info -->
     <string name="pref_co_code_us">US</string>
     <string name="pref_co_name_us">United States of America</string>
-    <string name="pref_co_flag_us">https://www.geoips.com//assets/img/flag/128h/us.png</string>
+    <string name="pref_co_flag_us">http://www.freeflagicons.com/download/?series=round_icon&amp;country=united_states_of_america&amp;size=256</string>
     <string name="pref_cu_id_us">USD</string>
     <string name="pref_cu_name_us">United States dollar</string>
     <string name="pref_cu_symbol_us">$</string>
 
     <string name="pref_co_code_co">CO</string>
     <string name="pref_co_name_co">Colombia</string>
-    <string name="pref_co_flag_co">https://www.geoips.com//assets/img/flag/128h/co.png</string>
+    <string name="pref_co_flag_co">http://www.freeflagicons.com/download/?series=round_icon&amp;country=colombia&amp;size=256</string>
     <string name="pref_cu_id_co">COP</string>
     <string name="pref_cu_name_co">Colombian peso</string>
     <string name="pref_cu_symbol_co">$</string>
 
     <string name="pref_co_code_za">ZA</string>
     <string name="pref_co_name_za">South Africa</string>
-    <string name="pref_co_flag_za">https://www.geoips.com//assets/img/flag/128h/za.png</string>
+    <string name="pref_co_flag_za">http://www.freeflagicons.com/download/?series=round_icon&amp;country=south_africa&amp;size=256</string>
     <string name="pref_cu_id_za">ZAR</string>
     <string name="pref_cu_name_za">South African rand</string>
     <string name="pref_cu_symbol_za">R</string>
 
     <string name="pref_co_code_eu">EU</string>
     <string name="pref_co_name_eu">Europe</string>
-    <string name="pref_co_flag_eu">http://europa.eu/about-eu/basic-information/symbols/images/flag_yellow_low.jpg</string>
+    <string name="pref_co_flag_eu">http://www.freeflagicons.com/download/?series=round_icon&amp;country=european_union&amp;size=256</string>
     <string name="pref_cu_id_eu">EUR</string>
     <string name="pref_cu_name_eu">European euro</string>
     <string name="pref_cu_symbol_eu">€</string>
 
     <string name="pref_co_code_gb">GB</string>
     <string name="pref_co_name_gb">United Kingdom</string>
-    <string name="pref_co_flag_gb">https://www.geoips.com//assets/img/flag/128h/gb.png</string>
+    <string name="pref_co_flag_gb">http://www.freeflagicons.com/download/?series=round_icon&amp;country=united_kingdom&amp;size=256</string>
     <string name="pref_cu_id_gb">GBP</string>
     <string name="pref_cu_name_gb">British pound</string>
     <string name="pref_cu_symbol_gb">£</string>
 
     <string name="pref_co_code_cn">CN</string>
     <string name="pref_co_name_cn">China</string>
-    <string name="pref_co_flag_cn">https://www.geoips.com//assets/img/flag/128h/cn.png</string>
+    <string name="pref_co_flag_cn">http://www.freeflagicons.com/download/?series=round_icon&amp;country=china&amp;size=256</string>
     <string name="pref_cu_id_cn">CNY</string>
     <string name="pref_cu_name_cn">Chinese yuan</string>
     <string name="pref_cu_symbol_cn">¥</string>

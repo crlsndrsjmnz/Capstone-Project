@@ -43,7 +43,8 @@
         android:maxHeight="@dimen/detail_icon"
         android:maxWidth="@dimen/detail_icon"
         app:layout_columnWeight="1"
-        app:layout_gravity="fill_horizontal" />
+        app:layout_gravity="fill_horizontal"
+        android:transitionName="@string/detail_flag_from_transition_name"/>
 
     <ImageView
         android:id="@+id/currencyToFlag"
@@ -52,7 +53,8 @@
         android:maxHeight="@dimen/detail_icon"
         android:maxWidth="@dimen/detail_icon"
         app:layout_columnWeight="1"
-        app:layout_gravity="fill_horizontal" />
+        app:layout_gravity="fill_horizontal"
+        android:transitionName="@string/detail_flag_to_transition_name"/>
 
     <android.support.v7.widget.Space
         app:layout_columnSpan="2"

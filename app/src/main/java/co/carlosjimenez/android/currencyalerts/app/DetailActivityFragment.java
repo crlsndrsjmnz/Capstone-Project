@@ -159,12 +159,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_alert) {
-            Toast.makeText(mContext, "Alert", Toast.LENGTH_SHORT).show();
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mContext.finishAfterTransition();
+                return true;
+            case R.id.action_alert:
+                Toast.makeText(mContext, "Alert", Toast.LENGTH_SHORT).show();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -300,9 +301,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         mDisplayedRate = String.format("%s - %s %s = %s %s", sDate, currencyFromRate, currencyFromId, currencyToRate, currencyToId);
 
-        if ( null != mToolbar ) {
+        mContext.supportStartPostponedEnterTransition();
+
+        if (null != mToolbar) {
             Menu menu = mToolbar.getMenu();
-            if ( null != menu ) menu.clear();
+            if (null != menu) menu.clear();
             mToolbar.inflateMenu(R.menu.detailfragment);
             finishCreatingMenu(mToolbar.getMenu());
         }

@@ -48,20 +48,26 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
 
     private static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_FUTURE_DAY = 1;
+
     final private Context mContext;
     final private ForexAdapterOnClickHandler mClickHandler;
+    final private View mEmptyView;
+
     // Flag to determine if we want to use a separate view for "today".
     private boolean mUseTodayLayout = true;
+
     private double mMainAmount = 1;
     private double mMaxRateValue;
     private String mMaxRateSymbol;
     private String mMaxRateString;
     private float mRateSize = 0;
+
     private Cursor mCursor;
 
-    public ForexAdapter(Context context, ForexAdapterOnClickHandler dh) {
+    public ForexAdapter(Context context, ForexAdapterOnClickHandler dh, View emptyView) {
         mContext = context;
         mClickHandler = dh;
+        mEmptyView = emptyView;
     }
 
     /*
@@ -175,6 +181,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
     public void swapCursor(Cursor newCursor) {
         mCursor = newCursor;
         notifyDataSetChanged();
+        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     public void recalculateRates(double mainCurrencyValue) {

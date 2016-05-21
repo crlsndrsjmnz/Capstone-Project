@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ The MIT License (MIT)
   ~
@@ -21,21 +22,24 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    android:transitionOrdering="together"
+    android:duration="250">
+    <fade xmlns:android="http://schemas.android.com/apk/res/android">
+        <targets>
+            <target android:excludeId="@android:id/statusBarBackground"/>
+            <target android:excludeId="@android:id/navigationBarBackground"/>
+        </targets>
+    </fade>
+    <slide android:slideEdge="top">
+        <targets>
+            <target android:targetId="@id/toolbar" />
+        </targets>
+    </slide>
+    <slide android:slideEdge="right">
+        <targets>
+            <target android:targetId="@id/detail_additional_pane" />
+        </targets>
+    </slide>
 
-<resources>
-    <style name="SettingsTheme" parent="@android:style/Theme.Material.Light.DarkActionBar">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-    </style>
-
-    <style name="AppTheme.Main" parent="@style/AppTheme">
-        <item name="android:windowContentTransitions">true</item>
-    </style>
-
-    <style name="AppTheme.Details" parent="@style/AppTheme">
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowEnterTransition">@transition/details_window_enter_transition</item>
-        <item name="android:windowReturnTransition">@transition/details_window_return_transition</item>
-    </style>
-
-</resources>
+</transitionSet>

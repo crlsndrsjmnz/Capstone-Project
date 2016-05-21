@@ -35,12 +35,9 @@
 
     <style name="SettingsTheme" parent="@style/AppTheme" />
 
-    <style name="AppTheme.Details" parent="@style/AppTheme" />
+    <style name="AppTheme.Main" parent="@style/AppTheme"/>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
+    <style name="AppTheme.Details" parent="@style/AppTheme" />
 
     <!-- main activity toolbar style -->
     <style name="Toolbar" parent="Widget.AppCompat.Toolbar">

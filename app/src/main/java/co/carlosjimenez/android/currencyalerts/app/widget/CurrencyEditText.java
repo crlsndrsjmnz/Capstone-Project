@@ -74,10 +74,10 @@ public class CurrencyEditText extends EditText {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
         if (mPrefix != null && mPrefix.length() > 0) {
             canvas.drawText(mPrefix, super.getCompoundPaddingLeft(), getBaseline(), getPaint());
         }
+        super.onDraw(canvas);
     }
 
     @Override

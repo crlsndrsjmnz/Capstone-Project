@@ -27,7 +27,12 @@ package co.carlosjimenez.android.currencyalerts.app;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback {
 
@@ -35,16 +40,20 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
     public static final String MAIN_FRAGMENT_TAG = "MAIN_FRAGMENT";
 
+    private MainActivityFragment fragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
+
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-
-            MainActivityFragment fragment = new MainActivityFragment();
+            if (fragment == null) {
+                fragment = new MainActivityFragment();
+            }
 
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.flMain, fragment, MAIN_FRAGMENT_TAG)
@@ -53,11 +62,18 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     }
 
     @Override
-    public void onItemSelected(Uri rateUri) {
+    public void onItemSelected(Uri rateUri, ImageView imageFrom, ForexAdapter.ForexAdapterViewHolder vh) {
         Intent intent = new Intent(this, DetailActivity.class)
                 .setData(rateUri);
 
-        startActivity(intent);
+        Pair<View, String> taFlagFrom = Pair.create((View)imageFrom, getString(R.string.detail_flag_from_transition_name));
+        Pair<View, String> taFlagTo = Pair.create((View)vh.mIconView, getString(R.string.detail_flag_to_transition_name));
+
+        ActivityOptionsCompat activityOptions =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                        taFlagFrom, taFlagTo);
+
+        ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
     }
 
     @Override

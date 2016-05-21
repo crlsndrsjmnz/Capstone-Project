@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ The MIT License (MIT)
   ~
   ~ Copyright (c) 2016 Carlos Andres Jimenez <apps@carlosandresjimenez.co>
@@ -22,20 +22,34 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <style name="SettingsTheme" parent="@android:style/Theme.Material.Light.DarkActionBar">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-    </style>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
-    <style name="AppTheme.Main" parent="@style/AppTheme">
-        <item name="android:windowContentTransitions">true</item>
-    </style>
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2">
 
-    <style name="AppTheme.Details" parent="@style/AppTheme">
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowEnterTransition">@transition/details_window_enter_transition</item>
-        <item name="android:windowReturnTransition">@transition/details_window_return_transition</item>
-    </style>
+        <include
+            layout="@layout/detail_grid_current"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-</resources>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/white" />
+
+    </FrameLayout>
+
+    <include
+        layout="@layout/detail_grid_extras"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2" />
+
+</LinearLayout>

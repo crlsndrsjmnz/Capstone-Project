@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ The MIT License (MIT)
   ~
   ~ Copyright (c) 2016 Carlos Andres Jimenez <apps@carlosandresjimenez.co>
@@ -21,28 +22,24 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    android:transitionOrdering="together"
+    android:duration="250">
+    <fade xmlns:android="http://schemas.android.com/apk/res/android">
+        <targets>
+            <target android:excludeId="@android:id/statusBarBackground"/>
+            <target android:excludeId="@android:id/navigationBarBackground"/>
+        </targets>
+    </fade>
+    <slide android:slideEdge="top">
+        <targets>
+            <target android:targetId="@id/toolbar" />
+        </targets>
+    </slide>
+    <slide android:slideEdge="bottom">
+        <targets>
+            <target android:targetId="@id/detail_additional_pane" />
+        </targets>
+    </slide>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="co.carlosjimenez.android.currencyalerts.app.MainActivityFragment"
-    tools:showIn="@layout/activity_main">
-
-    <include
-        layout="@layout/content_main_currency"
-        android:id="@+id/topPanel"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/main_view_height" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_forex"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/topPanel"
-        android:fitsSystemWindows="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-</RelativeLayout>
+</transitionSet>

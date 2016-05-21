@@ -97,7 +97,6 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
 
         // Stop the task if the currencies have already been loaded.
         if (Utility.getCurrencyStatus(mContext) == CURRENCY_STATUS_OK) {
-            Log.d(LOG_TAG, "Currencies already in DB.");
             return 0;
         }
 

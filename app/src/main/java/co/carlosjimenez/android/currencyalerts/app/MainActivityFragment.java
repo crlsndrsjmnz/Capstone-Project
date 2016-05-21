@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -102,15 +103,21 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     TextView mCurrencyDescription;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.appbarLayout)
+    AppBarLayout mAppBarLayout;
     @BindView(R.id.currencyFromFlag)
     ImageView mImageView;
-    @BindView(R.id.header_cover)
-    ImageView mCoverImageView;
+    @BindView(R.id.recyclerview_forex_empty)
+    TextView mTvEmptyView;
+
+//    @BindView(R.id.header_cover)
+//    ImageView mCoverImageView;
 
     private AppCompatActivity mContext;
     private FloatingActionButton mCalculateButton;
     private ForexAdapter mForexAdapter;
     private Currency mMainCurrency;
+    private boolean fabAdded = false;
 
     public MainActivityFragment() {
         setHasOptionsMenu(true);
@@ -126,7 +133,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
          * MainActivityFragment Callback to perform an action on the activity when an item
          * has been selected.
          */
-        void onItemSelected(Uri rateUri);
+        void onItemSelected(Uri rateUri, ImageView imageFrom, ForexAdapter.ForexAdapterViewHolder vh);
+
         void onSettingsSelected();
     }
 
@@ -134,6 +142,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCoordinatorLayout.removeView(mCalculateButton);
     }
 
     @Override
@@ -146,6 +160,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mContext = (AppCompatActivity) getActivity();
 
         mContext.setSupportActionBar(mToolbar);
+        mContext.getSupportActionBar().setDisplayShowHomeEnabled(true);
+        mContext.getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         mMainCurrency = Utility.getMainCurrency(mContext);
 
@@ -164,9 +180,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 String[] currencies = {mMainCurrency.getId(), currencyId};
 
                 double value = Double.parseDouble(mCurrencyEditText.getText().toString());
-                ((Callback) getActivity()).onItemSelected(ForexContract.RateEntry.buildCurrencyRateWithValue(currencies, value));
+                ((Callback) getActivity()).onItemSelected(
+                        ForexContract.RateEntry.buildCurrencyRateWithValue(currencies, value),
+                        mImageView,
+                        vh);
             }
-        });
+        }, mTvEmptyView);
 
         // specify an adapter (see also next example)
         mRecyclerView.setAdapter(mForexAdapter);
@@ -262,6 +281,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         String maxRateSymbol = "";
         double maxRateValue = 0;
 
+        updateEmptyView();
+
         if (data.getCount() == 0) {
             Log.e(LOG_TAG, "No data returned");
         } else {
@@ -292,7 +313,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     public void loadMainCurrencyDetails() {
         mCurrencyEditText.setPrefix(mMainCurrency.getSymbol());
-
+        mCurrencyEditText.setSelection(mCurrencyEditText.getText().length());
         mCurrencyEditText.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -306,13 +327,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             }
         });
 
-//        Glide.with(this)
-//                .load("http://processflows.co.uk/wp-content/blogs.dir/1/files/2013/05/finance.jpg")
-//                .error(R.drawable.generic)
-//                .crossFade()
-//                .centerCrop()
-//                .into(mCoverImageView);
-
         Glide.with(this)
                 .load(mMainCurrency.getCountryFlag())
                 .error(R.drawable.generic)
@@ -322,19 +336,50 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mCurrencyDescription.setText(mMainCurrency.getName());
     }
 
+    /*
+    Updates the empty list view with contextually relevant information that the user can
+    use to determine why they aren't seeing weather.
+ */
+    private void updateEmptyView() {
+        if (mForexAdapter.getItemCount() == 0) {
+            if (null != mTvEmptyView) {
+                // if cursor is empty, why? do we have an invalid location
+                int message = R.string.empty_forex_list;
+                @ForexSyncAdapter.ForexStatus int status = Utility.getForexStatus(getActivity());
+                switch (status) {
+                    case ForexSyncAdapter.FOREX_STATUS_SERVER_DOWN:
+                        message = R.string.empty_forex_list_server_down;
+                        break;
+                    case ForexSyncAdapter.FOREX_STATUS_SERVER_INVALID:
+                        message = R.string.empty_forex_list_server_error;
+                        break;
+                    case ForexSyncAdapter.FOREX_STATUS_INVALID:
+                        message = R.string.empty_forex_list_invalid;
+                        break;
+                    default:
+                        if (!Utility.isNetworkAvailable(getActivity())) {
+                            message = R.string.empty_forex_list_no_network;
+                        }
+                }
+                mTvEmptyView.setText(message);
+            }
+        }
+    }
+
     private void addFloatingActionButton() {
         final int fabSize = getResources().getDimensionPixelSize(R.dimen.size_fab);
         final int spacingDouble = getResources().getDimensionPixelSize(R.dimen.spacing_double);
 
-        int bottomOfQuestionView = mRelativeLayout.getBottom();
-        int bottomOfToolbar = mToolbar.getBottom();
+        //int bottomOfQuestionView = mCoordinatorLayout.getBottom();
+        int bottomOfToolbar = mAppBarLayout.getBottom();
+        //int widthOfToolbar = mToolbar.getWidth();
 
         final CoordinatorLayout.LayoutParams fabLayoutParams = new CoordinatorLayout.LayoutParams(fabSize, fabSize);
         fabLayoutParams.gravity = Gravity.END | Gravity.TOP;
         final int halfAFab = fabSize / 2;
 
         fabLayoutParams.setMargins(0, // left
-                bottomOfQuestionView + bottomOfToolbar - halfAFab, //top
+                bottomOfToolbar - fabSize, //top
                 0, // right
                 spacingDouble); // bottom
         MarginLayoutParamsCompat.setMarginEnd(fabLayoutParams, spacingDouble);
