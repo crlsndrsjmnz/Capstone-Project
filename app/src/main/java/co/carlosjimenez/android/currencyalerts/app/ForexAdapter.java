@@ -122,6 +122,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
         String currencyName = mCursor.getString(MainActivityFragment.COL_CURRENCY_TO_NAME);
         String currencySymbol = mCursor.getString(MainActivityFragment.COL_CURRENCY_TO_SYMBOL);
         String countryFlag = mCursor.getString(MainActivityFragment.COL_COUNTRY_TO_FLAG);
+        String countryName = mCursor.getString(MainActivityFragment.COL_COUNTRY_TO_NAME);
         double currencyRate = mCursor.getDouble(MainActivityFragment.COL_RATE_VAL);
 
         Glide.with(mContext)
@@ -129,12 +130,15 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
                 .error(defaultImage)
                 .crossFade()
                 .into(forexAdapterViewHolder.mIconView);
+        forexAdapterViewHolder.mIconView.setContentDescription(Utility.formatCountryFlagName(mContext, countryName));
 
         // Find TextView and set the name on it
         forexAdapterViewHolder.mCurrencyNameView.setText(currencyName);
+        forexAdapterViewHolder.mCurrencyNameView.setContentDescription(currencyName);
 
         // Find TextView and set weather forecast on it
         forexAdapterViewHolder.mCurrencyIdView.setText(currencyId);
+        forexAdapterViewHolder.mCurrencyIdView.setContentDescription(currencyId + " " + currencyName);
 
         // Read high temperature from cursor
         currencyRate = mMainAmount * currencyRate;
@@ -143,7 +147,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
         forexAdapterViewHolder.mCurrencyRateView.setTextSize(
                 TypedValue.COMPLEX_UNIT_PX,
                 Utility.getRateFontPXSize(mMaxRateString.length()));
-
+        forexAdapterViewHolder.mCurrencyRateView.setContentDescription(rateString);
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {

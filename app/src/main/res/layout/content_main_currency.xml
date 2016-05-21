@@ -59,6 +59,7 @@
                 android:maxLength="20"
                 android:singleLine="true"
                 android:text="1"
+                android:textDirection="anyRtl"
                 android:textAppearance="?android:textAppearanceLarge"
                 android:textColor="@color/primary_text_main" />
 

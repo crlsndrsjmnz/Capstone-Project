@@ -231,31 +231,43 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         data.moveToPosition(0);
 
+        String currencyFromId = data.getString(COL_CURRENCY_FROM_ID);
+        String currencyFromName = data.getString(COL_CURRENCY_FROM_NAME);
+        String currencyFromSymbol = data.getString(COL_CURRENCY_FROM_SYMBOL);
+        String countryFromName = data.getString(COL_COUNTRY_FROM_NAME);
+        double currencyFromRate = ForexContract.RateEntry.getRateFromUri(mUri);
+
+        String currencyToId = data.getString(COL_CURRENCY_TO_ID);
+        String currencyToName = data.getString(COL_CURRENCY_TO_NAME);
+        String currencyToSymbol = data.getString(COL_CURRENCY_TO_SYMBOL);
+        String countryToName = data.getString(COL_COUNTRY_TO_NAME);
+        double currencyToRate = ForexContract.RateEntry.getRateFromUri(mUri) * data.getDouble(COL_RATE_VAL);
+
         Glide.with(getActivity())
                 .load(data.getString(COL_COUNTRY_FROM_FLAG))
                 .error(R.drawable.generic)
                 .crossFade()
                 .into(mIvFlagFrom);
+        mIvFlagFrom.setContentDescription(Utility.formatCountryFlagName(mContext, countryFromName));
 
         Glide.with(getActivity())
                 .load(data.getString(COL_COUNTRY_TO_FLAG))
                 .error(R.drawable.generic)
                 .crossFade()
                 .into(mIvFlagTo);
+        mIvFlagFrom.setContentDescription(Utility.formatCountryFlagName(mContext, countryToName));
 
-        String currencyFromId = data.getString(COL_CURRENCY_FROM_ID);
-        String currencyFromName = data.getString(COL_CURRENCY_FROM_NAME);
-        String currencyFromSymbol = data.getString(COL_CURRENCY_FROM_SYMBOL);
-        double currencyFromRate = ForexContract.RateEntry.getRateFromUri(mUri);
         mTvCurrencyFromDesc.setText(currencyFromName);
-        mTvCurrencyFromRate.setText(Utility.formatCurrencyRate(getActivity(), currencyFromSymbol, currencyFromRate));
+        mTvCurrencyFromDesc.setContentDescription(currencyFromName);
 
-        String currencyToId = data.getString(COL_CURRENCY_TO_ID);
-        String currencyToName = data.getString(COL_CURRENCY_TO_NAME);
-        String currencyToSymbol = data.getString(COL_CURRENCY_TO_SYMBOL);
-        double currencyToRate = ForexContract.RateEntry.getRateFromUri(mUri) * data.getDouble(COL_RATE_VAL);
+        mTvCurrencyFromRate.setText(Utility.formatCurrencyRate(getActivity(), currencyFromSymbol, currencyFromRate));
+        mTvCurrencyFromRate.setContentDescription(String.valueOf(currencyFromRate) + " " + currencyFromName);
+
         mTvCurrencyToDesc.setText(currencyToName);
+        mTvCurrencyToDesc.setContentDescription(currencyToName);
+
         mTvCurrencyToRate.setText(Utility.formatCurrencyRate(getActivity(), currencyToSymbol, currencyToRate));
+        mTvCurrencyToRate.setContentDescription(String.valueOf(currencyToRate) + " " + currencyToName);
 
         Time dayTime = new Time();
         dayTime.setToNow();
@@ -294,11 +306,18 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             mTvPeriod.setText(data.getCount() + " days");
         else
             mTvPeriod.setText(data.getCount() + " day");
+        mTvMaxRate.setContentDescription(mTvPeriod.getText());
 
         mTvMaxRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), dMaxVal));
-        mTvMinRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), dMinVal));
-        mTvAverageRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), dRateAverage));
+        mTvMaxRate.setContentDescription(mTvMaxRate.getText());
 
+        mTvMinRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), dMinVal));
+        mTvMinRate.setContentDescription(mTvMinRate.getText());
+
+        mTvAverageRate.setText(Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), dRateAverage));
+        mTvAverageRate.setContentDescription(mTvAverageRate.getText());
+
+        // String text to share if user clicks on share menu icon
         mDisplayedRate = String.format("%s - %s %s = %s %s", sDate, currencyFromRate, currencyFromId, currencyToRate, currencyToId);
 
         mContext.supportStartPostponedEnterTransition();

@@ -171,6 +171,10 @@ public class Utility {
         return dateFormat.format(dateInMillis);
     }
 
+    public static String formatCountryFlagName(Context context, String country_name) {
+        return context.getString(R.string.format_country_flag_description, country_name);
+    }
+
     public static String formatCurrencyRate(Context context, String currency_symbol, double currencyRate) {
 
         String rate = context.getString(R.string.format_currency_rate, currency_symbol, currencyRate);

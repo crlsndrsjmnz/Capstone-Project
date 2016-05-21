@@ -25,6 +25,7 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <string name="app_name">Currency Alerts</string>
+
     <string name="action_refresh">Refresh</string>
     <string name="action_settings">Settings</string>
     <string name="action_share">Share</string>
@@ -39,6 +40,8 @@
     <string name="min_rate_label">Min Rate</string>
     <string name="average_rate_label">Average</string>
 
+    <string name="calculate_description">Calculate rate values on other currencies</string>
+
     <!-- Empty Weather Database -->
     <string name="empty_forex_list">No Rates Information Available</string>
     <string name="empty_forex_list_no_network">No rates information available. The network is not available to fetch rates data.</string>
@@ -50,6 +53,8 @@
     <!-- Temperature format [CHAR LIMIT=5 -->
     <string name="format_currency_rate"><xliff:g id="prefix">%1$s</xliff:g> <xliff:g id="rate">%2$1.2f</xliff:g></string>
     <string name="title_activity_detail">DetailActivity</string>
+
+    <string name="format_country_flag_description">Flag of <xliff:g id="rate">%1$s</xliff:g></string>
 
     <string name="detail_flag_from_transition_name" translatable="false">TN_DetailFragFrom</string>
     <string name="detail_flag_to_transition_name" translatable="false">TN_DetailFlagTo</string>

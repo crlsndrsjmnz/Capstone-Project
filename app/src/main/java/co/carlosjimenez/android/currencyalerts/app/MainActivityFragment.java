@@ -332,8 +332,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 .error(R.drawable.generic)
                 .crossFade()
                 .into(mImageView);
+        mImageView.setContentDescription(Utility.formatCountryFlagName(mContext, mMainCurrency.getCountryName()));
 
         mCurrencyDescription.setText(mMainCurrency.getName());
+        mImageView.setContentDescription(mMainCurrency.getName());
     }
 
     /*
@@ -394,6 +396,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         if (null == mCalculateButton) {
             mCalculateButton = new FloatingActionButton(mContext);
             mCalculateButton.setImageDrawable(mContext.getDrawable(R.drawable.ic_calculator_grey600_24dp));
+            mCalculateButton.setContentDescription(mContext.getString(R.string.calculate_description));
             mCalculateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

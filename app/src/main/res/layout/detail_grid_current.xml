@@ -42,9 +42,9 @@
         android:adjustViewBounds="true"
         android:maxHeight="@dimen/detail_icon"
         android:maxWidth="@dimen/detail_icon"
+        android:transitionName="@string/detail_flag_from_transition_name"
         app:layout_columnWeight="1"
-        app:layout_gravity="fill_horizontal"
-        android:transitionName="@string/detail_flag_from_transition_name"/>
+        app:layout_gravity="fill_horizontal" />
 
     <ImageView
         android:id="@+id/currencyToFlag"
@@ -52,9 +52,9 @@
         android:adjustViewBounds="true"
         android:maxHeight="@dimen/detail_icon"
         android:maxWidth="@dimen/detail_icon"
+        android:transitionName="@string/detail_flag_to_transition_name"
         app:layout_columnWeight="1"
-        app:layout_gravity="fill_horizontal"
-        android:transitionName="@string/detail_flag_to_transition_name"/>
+        app:layout_gravity="fill_horizontal" />
 
     <android.support.v7.widget.Space
         app:layout_columnSpan="2"
@@ -93,6 +93,7 @@
         android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/secondary_text"
+        android:textDirection="anyRtl"
         app:layout_columnWeight="1"
         app:layout_gravity="fill_horizontal"
         tools:text="$ 1" />
@@ -105,6 +106,7 @@
         android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/secondary_text"
+        android:textDirection="anyRtl"
         app:layout_columnWeight="1"
         app:layout_gravity="fill_horizontal"
         tools:text="$ 2950.00" />
