@@ -95,8 +95,7 @@
         android:textColor="@color/secondary_text"
         android:textDirection="anyRtl"
         app:layout_columnWeight="1"
-        app:layout_gravity="fill_horizontal"
-        tools:text="$ 1" />
+        app:layout_gravity="fill_horizontal" />
 
     <TextView
         android:id="@+id/currencyToRate"
@@ -108,8 +107,7 @@
         android:textColor="@color/secondary_text"
         android:textDirection="anyRtl"
         app:layout_columnWeight="1"
-        app:layout_gravity="fill_horizontal"
-        tools:text="$ 2950.00" />
+        app:layout_gravity="fill_horizontal" />
 
     <android.support.v7.widget.Space
         android:layout_height="@dimen/abc_list_item_padding_horizontal_material"

@@ -45,8 +45,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="8dp"
-            android:paddingStart="8dp">
+            android:paddingLeft="@dimen/spacing_normal"
+            android:paddingStart="@dimen/spacing_normal">
 
             <co.carlosjimenez.android.currencyalerts.app.widget.CurrencyEditText
                 android:id="@+id/currencyFromAmount"
@@ -67,8 +67,8 @@
                 android:id="@+id/currencyFromDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginStart="4dp"
+                android:layout_marginLeft="@dimen/spacing_micro"
+                android:layout_marginStart="@dimen/spacing_micro"
                 android:fontFamily="sans-serif"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:textColor="@color/secondary_text_main" />

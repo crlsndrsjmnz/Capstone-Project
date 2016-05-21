@@ -25,7 +25,6 @@
 <!-- Detail Layout for Grid -->
 <android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/detail_additional_pane"
     android:layout_width="match_parent"
     android:layout_height="0dp"
@@ -55,8 +54,7 @@
         android:gravity="center_vertical"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textColor="@android:color/white"
-        app:layout_gravity="fill"
-        tools:text="1 Month" />
+        app:layout_gravity="fill" />
 
     <TextView
         android:layout_height="wrap_content"
@@ -75,8 +73,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textColor="@android:color/white"
         android:textDirection="anyRtl"
-        app:layout_gravity="fill"
-        tools:text="$ 2992.01" />
+        app:layout_gravity="fill" />
 
     <TextView
         android:fontFamily="sans-serif"
@@ -93,15 +90,14 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textColor="@android:color/white"
         android:textDirection="anyRtl"
-        app:layout_gravity="fill"
-        tools:text="$ 2901.34" />
+        app:layout_gravity="fill" />
 
     <TextView
         android:fontFamily="sans-serif"
         android:gravity="center_vertical"
         android:text="@string/average_rate_label"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/detail_accent_label"
-        android:textSize="20sp"
         app:layout_gravity="fill"
         app:layout_rowWeight="1" />
 
@@ -111,7 +107,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textColor="@android:color/white"
         android:textDirection="anyRtl"
-        app:layout_gravity="fill"
-        tools:text="$ 2945.32" />
+        app:layout_gravity="fill" />
 
 </android.support.v7.widget.GridLayout>
