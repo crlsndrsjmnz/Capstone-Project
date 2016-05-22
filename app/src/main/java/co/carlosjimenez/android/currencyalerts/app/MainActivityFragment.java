@@ -250,7 +250,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         super.onResume();
 
         LocalBroadcastManager.getInstance(mContext).registerReceiver(mMessageReceiver,
-                new IntentFilter(ForexSyncAdapter.FOREX_DATA_UPDATED));
+                new IntentFilter(ForexSyncAdapter.ACTION_DATA_UPDATED));
 
     }
 

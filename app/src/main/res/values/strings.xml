@@ -40,6 +40,8 @@
     <string name="min_rate_label">Min Rate</string>
     <string name="average_rate_label">Average</string>
 
+    <string name="title_widget_detail">Currency Forecast</string>
+
     <string name="calculate_description">Calculate rate values on other currencies</string>
 
     <!-- Empty Weather Database -->

@@ -65,7 +65,8 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String LOG_TAG = ForexSyncAdapter.class.getSimpleName();
 
-    public static final String FOREX_DATA_UPDATED = "co.carlosjimenez.android.currencyalerts.app.FOREX_DATA_UPDATED";
+    public static final String ACTION_DATA_UPDATED =
+            "co.carlosjimenez.android.currencyalerts.app.ACTION_DATA_UPDATED";
     public static final String FOREX_DATA_STATUS = "FOREX_DATA_STATUS";
 
     public static final int FOREX_DAYS_TO_KEEP = 40;
@@ -405,7 +406,7 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
         Context context = getContext();
 
         // Setting the package ensures that only components in our app will receive the broadcast
-        Intent dataUpdatedIntent = new Intent(FOREX_DATA_UPDATED)
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
                 .setPackage(context.getPackageName())
                 .putExtra(FOREX_DATA_STATUS, status);
         LocalBroadcastManager.getInstance(context).sendBroadcast(dataUpdatedIntent);
