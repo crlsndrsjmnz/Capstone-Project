@@ -209,12 +209,12 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         if (data == null) {
-            Log.d(LOG_TAG, "Forex Loader Finished: No data returned");
+            Log.d(LOG_TAG, "Detail Forex Loader Finished: No data returned");
 
             return;
         }
         if (!data.moveToFirst()) {
-            Log.d(LOG_TAG, "Forex Loader Finished: No data returned");
+            Log.d(LOG_TAG, "Detail Forex Loader Finished: No data returned");
 
             data.close();
             return;
@@ -245,14 +245,14 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         Glide.with(getActivity())
                 .load(data.getString(COL_COUNTRY_FROM_FLAG))
-                .error(R.drawable.generic)
+                .error(R.drawable.globe)
                 .crossFade()
                 .into(mIvFlagFrom);
         mIvFlagFrom.setContentDescription(Utility.formatCountryFlagName(mContext, countryFromName));
 
         Glide.with(getActivity())
                 .load(data.getString(COL_COUNTRY_TO_FLAG))
-                .error(R.drawable.generic)
+                .error(R.drawable.globe)
                 .crossFade()
                 .into(mIvFlagTo);
         mIvFlagFrom.setContentDescription(Utility.formatCountryFlagName(mContext, countryToName));

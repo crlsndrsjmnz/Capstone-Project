@@ -25,6 +25,10 @@
 package co.carlosjimenez.android.currencyalerts.app;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -32,10 +36,12 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MarginLayoutParamsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -118,6 +124,19 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private ForexAdapter mForexAdapter;
     private Currency mMainCurrency;
     private boolean fabAdded = false;
+
+    // handler for received Intents for the "my-event" event
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            int message = intent.getIntExtra(ForexSyncAdapter.FOREX_DATA_STATUS, -1);
+
+            if (message == ForexSyncAdapter.FOREX_STATUS_OK) {
+                refreshForexList();
+            }
+        }
+    };
 
     public MainActivityFragment() {
         setHasOptionsMenu(true);
@@ -227,6 +246,21 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(mMessageReceiver,
+                new IntentFilter(ForexSyncAdapter.FOREX_DATA_UPDATED));
+
+    }
+
+    @Override
+    public void onPause() {
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mMessageReceiver);
+        super.onPause();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (getActivity() instanceof MainActivity) {
             // Inflate the menu; this adds items to the action bar if it is present.
@@ -283,18 +317,26 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         updateEmptyView();
 
-        if (data.getCount() == 0) {
-            Log.e(LOG_TAG, "No data returned");
-        } else {
-            for (int i = 0; i < data.getCount(); i++) {
-                data.moveToPosition(i);
-                rateString = Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), data.getDouble(COL_RATE_VAL));
+        if (data == null) {
+            Log.d(LOG_TAG, "Main Forex Loader Finished: No data returned");
 
-                if (rateString.length() > maxRateString.length()) {
-                    maxRateString = rateString;
-                    maxRateSymbol = data.getString(COL_CURRENCY_TO_SYMBOL);
-                    maxRateValue = data.getDouble(COL_RATE_VAL);
-                }
+            return;
+        }
+        if (data.getCount() <= 0) {
+            Log.d(LOG_TAG, "Main Forex Loader Finished: No data returned");
+
+            data.close();
+            return;
+        }
+
+        for (int i = 0; i < data.getCount(); i++) {
+            data.moveToPosition(i);
+            rateString = Utility.formatCurrencyRate(getActivity(), data.getString(COL_CURRENCY_TO_SYMBOL), data.getDouble(COL_RATE_VAL));
+
+            if (rateString.length() > maxRateString.length()) {
+                maxRateString = rateString;
+                maxRateSymbol = data.getString(COL_CURRENCY_TO_SYMBOL);
+                maxRateValue = data.getDouble(COL_RATE_VAL);
             }
         }
 
@@ -309,6 +351,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     public void refresh() {
         ForexSyncAdapter.syncImmediately(getActivity());
+    }
+
+    public void refreshForexList() {
+        getLoaderManager().restartLoader(FOREX_LOADER, null, this);
     }
 
     public void loadMainCurrencyDetails() {
@@ -329,7 +375,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         Glide.with(this)
                 .load(mMainCurrency.getCountryFlag())
-                .error(R.drawable.generic)
+                .error(R.drawable.globe)
+                .centerCrop()
                 .crossFade()
                 .into(mImageView);
         mImageView.setContentDescription(Utility.formatCountryFlagName(mContext, mMainCurrency.getCountryName()));
@@ -340,8 +387,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     /*
     Updates the empty list view with contextually relevant information that the user can
-    use to determine why they aren't seeing weather.
- */
+    use to determine why they aren't seeing currency rates.
+    */
     private void updateEmptyView() {
         if (mForexAdapter.getItemCount() == 0) {
             if (null != mTvEmptyView) {
@@ -411,8 +458,23 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     public void calculateRates() {
+        if (mForexAdapter != null || mForexAdapter.getItemCount() == 0) {
+            showErrorMessage(getString(R.string.empty_forex_list));
+            return;
+        }
+
         mForexAdapter.setMainAmount(Double.parseDouble(mCurrencyEditText.getText().toString()));
         hideIme();
+    }
+
+    public void showErrorMessage(String message) {
+        Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG)
+                .setAction("Refresh", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        refresh();
+                    }
+                }).show();
     }
 
     public void hideIme() {

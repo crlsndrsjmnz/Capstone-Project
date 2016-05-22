@@ -114,7 +114,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
                 useLongToday = true;
                 break;
             default:
-                defaultImage = R.drawable.generic;
+                defaultImage = R.drawable.globe;
                 useLongToday = false;
         }
 
@@ -128,6 +128,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
         Glide.with(mContext)
                 .load(countryFlag)
                 .error(defaultImage)
+                .centerCrop()
                 .crossFade()
                 .into(forexAdapterViewHolder.mIconView);
         forexAdapterViewHolder.mIconView.setContentDescription(Utility.formatCountryFlagName(mContext, countryName));

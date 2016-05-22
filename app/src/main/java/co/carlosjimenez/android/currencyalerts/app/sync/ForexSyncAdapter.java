@@ -31,6 +31,7 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
@@ -39,6 +40,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -63,8 +65,8 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String LOG_TAG = ForexSyncAdapter.class.getSimpleName();
 
-    public static final String ACTION_DATA_UPDATED =
-            "co.carlosjimenez.android.currencyalerts.app.ACTION_DATA_UPDATED";
+    public static final String FOREX_DATA_UPDATED = "co.carlosjimenez.android.currencyalerts.app.FOREX_DATA_UPDATED";
+    public static final String FOREX_DATA_STATUS = "FOREX_DATA_STATUS";
 
     public static final int FOREX_DAYS_TO_KEEP = 40;
 
@@ -390,11 +392,22 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
             Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
             setForexStatus(getContext(), FOREX_STATUS_OK);
             setForexSyncDate(getContext(), System.currentTimeMillis());
+            sendSyncBroadcast(FOREX_STATUS_OK);
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
             setForexStatus(getContext(), FOREX_STATUS_SERVER_INVALID);
         }
+    }
+
+    private void sendSyncBroadcast(int status) {
+        Context context = getContext();
+
+        // Setting the package ensures that only components in our app will receive the broadcast
+        Intent dataUpdatedIntent = new Intent(FOREX_DATA_UPDATED)
+                .setPackage(context.getPackageName())
+                .putExtra(FOREX_DATA_STATUS, status);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(dataUpdatedIntent);
     }
 }
