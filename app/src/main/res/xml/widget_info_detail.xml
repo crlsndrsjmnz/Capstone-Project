@@ -31,7 +31,7 @@
     android:minResizeHeight="@dimen/widget_detail_min_resize_height"
     android:minResizeWidth="@dimen/widget_detail_min_resize_width"
     android:minWidth="@dimen/widget_detail_default_width"
-    android:previewImage="@mipmap/ic_launcher"
+    android:previewImage="@drawable/currency_forecast_widget_portrait"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen|keyguard"

@@ -42,7 +42,7 @@
      font sizes, and going larger will cause lots of view problems.  This is only for
      the large forecast numbers in the forecast list -->
     <dimen name="rate_text_size">35sp</dimen>
-    <dimen name="widget_rate_text_size">24sp</dimen>
+    <dimen name="widget_rate_text_size">22sp</dimen>
 
     <dimen name="size_fab">56dp</dimen>
 
