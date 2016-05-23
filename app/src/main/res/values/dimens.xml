@@ -62,4 +62,6 @@
     <dimen name="widget_detail_min_resize_width">250dp</dimen>
     <dimen name="widget_detail_min_resize_height">@dimen/widget_detail_default_height</dimen>
 
+    <dimen name="banner_ad_height">50dp</dimen>
+
 </resources>

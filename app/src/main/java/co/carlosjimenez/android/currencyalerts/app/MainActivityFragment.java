@@ -64,6 +64,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -115,6 +117,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     ImageView mImageView;
     @BindView(R.id.recyclerview_forex_empty)
     TextView mTvEmptyView;
+    @BindView(R.id.adView)
+    AdView mAdView;
 
 //    @BindView(R.id.header_cover)
 //    ImageView mCoverImageView;
@@ -210,8 +214,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mRecyclerView.setAdapter(mForexAdapter);
 
         getCalculateButton();
-
         loadMainCurrencyDetails();
+        loadAd();
 
         mCoordinatorLayout.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -428,7 +432,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         final int halfAFab = fabSize / 2;
 
         fabLayoutParams.setMargins(0, // left
-                bottomOfToolbar - fabSize, //top
+                bottomOfToolbar - halfAFab, //top
                 0, // right
                 spacingDouble); // bottom
         MarginLayoutParamsCompat.setMarginEnd(fabLayoutParams, spacingDouble);
@@ -486,5 +490,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             view = new View(mContext);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public void loadAd() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+        mAdView.loadAd(adRequest);
     }
 }

@@ -47,6 +47,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -104,6 +106,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     TextView mTvCurrencyToRate;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.adView)
+    AdView mAdView;
 
     private Uri mUri;
     private AppCompatActivity mContext;
@@ -135,6 +139,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             mContext.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             mContext.getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
+
+        loadAd();
 
         return rootView;
     }
@@ -333,5 +339,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    public void loadAd() {
+        if(mAdView != null) {
+            AdRequest adRequest = new AdRequest.Builder()
+                    .build();
+            mAdView.loadAd(adRequest);
+        }
     }
 }

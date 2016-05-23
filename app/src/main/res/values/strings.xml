@@ -44,6 +44,8 @@
 
     <string name="calculate_description">Calculate rate values on other currencies</string>
 
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+
     <!-- Empty Weather Database -->
     <string name="empty_forex_list">No Rates Information Available</string>
     <string name="empty_forex_list_no_network">No rates information available. The network is not available to fetch rates data.</string>
