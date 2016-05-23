@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -49,6 +50,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -109,11 +111,17 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @BindView(R.id.adView)
     AdView mAdView;
 
+    private final Handler mHandler = new Handler();
+    private static final int AD_DELAY_MILLISECONDS = 1000;
+
     private Uri mUri;
     private AppCompatActivity mContext;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final String FOREX_SHARE_HASHTAG = " #CurrencyRatesApp";
 
+    private String mDisplayedCurrencyIds;
+    private String mDisplayedCurrencyNames;
     private String mDisplayedRate;
 
     public DetailActivityFragment() {
@@ -124,15 +132,16 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        ButterKnife.bind(this, rootView);
+
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DETAIL_URI);
         }
 
         mContext = (AppCompatActivity) getActivity();
-
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        ButterKnife.bind(this, rootView);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(mContext);
 
         if (mToolbar != null) {
             mContext.setSupportActionBar(mToolbar);
@@ -140,7 +149,12 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             mContext.getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        loadAd();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadAd();
+            }
+        }, AD_DELAY_MILLISECONDS);
 
         return rootView;
     }
@@ -166,6 +180,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
+            case R.id.action_share:
+                sendShareHitToAnalytics(mDisplayedCurrencyIds, mDisplayedCurrencyNames);
+                break;
             case android.R.id.home:
                 mContext.finishAfterTransition();
                 return true;
@@ -325,6 +342,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         // String text to share if user clicks on share menu icon
         mDisplayedRate = String.format("%s - %s %s = %s %s", sDate, currencyFromRate, currencyFromId, currencyToRate, currencyToId);
+        mDisplayedCurrencyIds = currencyFromId + "-" + currencyToId;
+        mDisplayedCurrencyNames = currencyToName;
 
         mContext.supportStartPostponedEnterTransition();
 
@@ -342,10 +361,19 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     }
 
     public void loadAd() {
-        if(mAdView != null) {
+        if (mAdView != null) {
             AdRequest adRequest = new AdRequest.Builder()
                     .build();
             mAdView.loadAd(adRequest);
         }
     }
+
+    private void sendShareHitToAnalytics(String currencyIds, String currencyNames) {
+        Bundle payload = new Bundle();
+        payload.putString(FirebaseAnalytics.Param.ITEM_ID, currencyIds);
+        payload.putString(FirebaseAnalytics.Param.ITEM_NAME, currencyNames);
+        payload.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "text/html");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
+    }
+
 }

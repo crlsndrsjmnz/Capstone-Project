@@ -36,8 +36,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import co.carlosjimenez.android.currencyalerts.app.data.ForexContract;
-
 /**
  * {@link ForexAdapter} exposes a list of weather forecasts
  * from a {@link android.database.Cursor} to a {@link android.support.v7.widget.RecyclerView}.
@@ -205,7 +203,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
     }
 
     public interface ForexAdapterOnClickHandler {
-        void onClick(String currencyId, ForexAdapterViewHolder vh);
+        void onClick(String currencyId, String currencyName, ForexAdapterViewHolder vh);
     }
 
     /**
@@ -230,8 +228,9 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-            int currencyIdColumnIndex = mCursor.getColumnIndex(ForexContract.RateEntry.COLUMN_RATE_TO_KEY);
-            mClickHandler.onClick(mCursor.getString(currencyIdColumnIndex), this);
+            String currencyId = mCursor.getString(MainActivityFragment.COL_CURRENCY_TO_ID);
+            String currencyName = mCursor.getString(MainActivityFragment.COL_CURRENCY_TO_NAME);
+            mClickHandler.onClick(currencyId, currencyName, this);
         }
     }
 }

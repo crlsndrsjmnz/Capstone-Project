@@ -33,6 +33,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -66,6 +67,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -127,7 +129,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private FloatingActionButton mCalculateButton;
     private ForexAdapter mForexAdapter;
     private Currency mMainCurrency;
-    private boolean fabAdded = false;
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+    private final Handler mHandler = new Handler();
+    private static final int AD_DELAY_MILLISECONDS = 1000;
 
     // handler for received Intents for the "my-event" event
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -181,6 +186,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         ButterKnife.bind(this, rootView);
 
         mContext = (AppCompatActivity) getActivity();
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(mContext);
 
         mContext.setSupportActionBar(mToolbar);
         mContext.getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -199,8 +205,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // use it to populate the RecyclerView it's attached to.
         mForexAdapter = new ForexAdapter(mContext, new ForexAdapter.ForexAdapterOnClickHandler() {
             @Override
-            public void onClick(String currencyId, ForexAdapter.ForexAdapterViewHolder vh) {
+            public void onClick(String currencyId, String currencyName, ForexAdapter.ForexAdapterViewHolder vh) {
                 String[] currencies = {mMainCurrency.getId(), currencyId};
+
+                sendHitToAnalytics(currencyId, currencyName);
 
                 double value = Double.parseDouble(mCurrencyEditText.getText().toString());
                 ((Callback) getActivity()).onItemSelected(
@@ -215,7 +223,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         getCalculateButton();
         loadMainCurrencyDetails();
-        loadAd();
 
         mCoordinatorLayout.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -231,6 +238,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         forexTask.execute();
 
         ForexSyncAdapter.initializeSyncAdapter(mContext);
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadAd();
+            }
+        }, AD_DELAY_MILLISECONDS);
 
         return rootView;
     }
@@ -277,15 +291,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            ((Callback) getActivity()).onSettingsSelected();
-            return true;
-        } else if (id == R.id.action_refresh) {
-            refresh();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                ((Callback) getActivity()).onSettingsSelected();
+                return true;
+            case R.id.action_refresh:
+                refresh();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -345,6 +358,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         }
 
         mForexAdapter.setMaxRateVal(maxRateSymbol, maxRateValue);
+//        mForexAdapter.setMaxRateVal("$", 1000000000);
         mForexAdapter.swapCursor(data);
     }
 
@@ -462,7 +476,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     public void calculateRates() {
-        if (mForexAdapter != null || mForexAdapter.getItemCount() == 0) {
+        if (mForexAdapter == null || mForexAdapter.getItemCount() == 0) {
             showErrorMessage(getString(R.string.empty_forex_list));
             return;
         }
@@ -471,7 +485,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         hideIme();
     }
 
-    public void showErrorMessage(String message) {
+    private void showErrorMessage(String message) {
         Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG)
                 .setAction("Refresh", new View.OnClickListener() {
                     @Override
@@ -481,7 +495,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 }).show();
     }
 
-    public void hideIme() {
+    private void hideIme() {
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
         //Find the currently focused view, so we can grab the correct window token from it.
         View view = mContext.getCurrentFocus();
@@ -492,9 +506,17 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public void loadAd() {
+    private void loadAd() {
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
         mAdView.loadAd(adRequest);
+    }
+
+    private void sendHitToAnalytics(String currencyId, String currencyName) {
+        Bundle payload = new Bundle();
+        payload.putString(FirebaseAnalytics.Param.ITEM_ID, currencyId);
+        payload.putString(FirebaseAnalytics.Param.ITEM_NAME, currencyName);
+        payload.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "text/html");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, payload);
     }
 }
