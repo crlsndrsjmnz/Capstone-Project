@@ -36,6 +36,10 @@
             android:summaryOff="@string/pref_enable_notifications_false"
             android:summaryOn="@string/pref_enable_notifications_true"
             android:title="@string/pref_enable_notifications_label" />
+
+        <Preference
+            android:key="@string/pref_delete_alerts_key"
+            android:title="@string/pref_delete_alerts_label" />
     </PreferenceCategory>
 
     <PreferenceCategory

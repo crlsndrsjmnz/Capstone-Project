@@ -35,11 +35,15 @@ import co.carlosjimenez.android.currencyalerts.app.R;
 
 public class CurrencyEditText extends EditText {
 
-    private String mPrefix; // can be hardcoded for demo purposes
+    private String mPrefix;
     private Rect mPrefixRect = new Rect(); // actual prefix size
+    private int color;
 
     public CurrencyEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        color = context.getResources().getColor(R.color.primary_text_main);
+
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
                 R.styleable.CurrencyEditText,
@@ -65,6 +69,7 @@ public class CurrencyEditText extends EditText {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (mPrefix != null && mPrefix.length() > 0) {
+            getPaint().setColor(color);
             getPaint().getTextBounds(mPrefix, 0, mPrefix.length(), mPrefixRect);
             mPrefixRect.right += getPaint().measureText(" "); // add some offset
         }

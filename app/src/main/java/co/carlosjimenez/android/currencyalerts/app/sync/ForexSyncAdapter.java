@@ -411,4 +411,19 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
                 .putExtra(FOREX_DATA_STATUS, status);
         LocalBroadcastManager.getInstance(context).sendBroadcast(dataUpdatedIntent);
     }
+
+
+    private void validateRateIncrease() {
+        // If there is an alert and the notification is enabled validate rate increase.
+
+        // Validate rate percentage increase against the one on the shared preferences
+
+        // Shared preferences average should be recalculated when the sync day != current day
+
+        // We have to get all rates for that currency and calculate the average.
+    }
+
+    private void notifyUser() {
+        // Send Alert to the user about increase on the rate if the notification setting is activated
+    }
 }

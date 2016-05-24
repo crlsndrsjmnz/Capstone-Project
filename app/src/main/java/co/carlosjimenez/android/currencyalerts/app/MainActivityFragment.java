@@ -27,6 +27,7 @@ package co.carlosjimenez.android.currencyalerts.app;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -44,6 +45,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MarginLayoutParamsCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -358,7 +360,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         }
 
         mForexAdapter.setMaxRateVal(maxRateSymbol, maxRateValue);
-//        mForexAdapter.setMaxRateVal("$", 1000000000);
         mForexAdapter.swapCursor(data);
     }
 
@@ -481,6 +482,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             return;
         }
 
+        if (mCurrencyEditText == null || mCurrencyEditText.getText().length() <= 0) {
+            showAlertMessage();
+            return;
+        }
+
         mForexAdapter.setMainAmount(Double.parseDouble(mCurrencyEditText.getText().toString()));
         hideIme();
     }
@@ -493,6 +499,25 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                         refresh();
                     }
                 }).show();
+    }
+
+    private void showAlertMessage() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage(mContext.getString(R.string.dialog_calc_rates_empty_value))
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
     }
 
     private void hideIme() {

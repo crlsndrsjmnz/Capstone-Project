@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ The MIT License (MIT)
   ~
   ~ Copyright (c) 2016 Carlos Andres Jimenez <apps@carlosandresjimenez.co>
@@ -22,31 +22,14 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="toolbarStyle">@style/Toolbar</item>
-    </style>
-
-    <style name="SettingsTheme" parent="@style/AppTheme" />
-
-    <style name="AppTheme.Main" parent="@style/AppTheme" />
-
-    <style name="AppTheme.Details" parent="@style/AppTheme" />
-
-    <!-- main activity toolbar style -->
-    <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="popupTheme">@style/Theme.AppCompat.Light</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-</resources>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    style="?android:attr/spinnerItemStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:ellipsize="marquee"
+    android:fontFamily="sans-serif"
+    android:singleLine="true"
+    android:textAlignment="inherit"
+    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+    android:textColor="@color/primary_text" />

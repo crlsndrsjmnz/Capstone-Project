@@ -73,7 +73,6 @@
             android:fontFamily="sans-serif-light"
             android:padding="@dimen/spacing_normal"
             android:gravity="center_vertical|left"
-            android:maxLines="1"
             android:textColor="@color/primary_text"
             android:textDirection="anyRtl"
             android:textSize="@dimen/rate_text_size" />

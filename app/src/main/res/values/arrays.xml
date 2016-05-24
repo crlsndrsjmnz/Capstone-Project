@@ -25,6 +25,22 @@
 
 <resources>
 
+    <string-array name="alarm_period_labels">
+        <item>@string/alarm_period_3_months_label</item>
+        <item>@string/alarm_period_2_months_label</item>
+        <item>@string/alarm_period_1_month_label</item>
+        <item>@string/alarm_period_1_week_label</item>
+        <item>@string/alarm_period_1_day_label</item>
+    </string-array>
+
+    <string-array name="alarm_period_values">
+        <item>@string/alarm_period_3_months_value</item>
+        <item>@string/alarm_period_2_months_value</item>
+        <item>@string/alarm_period_1_month_value</item>
+        <item>@string/alarm_period_1_week_value</item>
+        <item>@string/alarm_period_1_day_value</item>
+    </string-array>
+
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>
         <item>30 minutes</item>

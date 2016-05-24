@@ -31,6 +31,8 @@
     <string name="action_settings">Settings</string>
     <string name="action_share">Share</string>
     <string name="action_alert">Alert</string>
+    <string name="action_save">Save</string>
+    <string name="action_remove">Remove</string>
 
     <!-- SyncAdapter related -->
     <string name="sync_account_type">currencyalerts.carlosjimenez.co</string>
@@ -41,11 +43,31 @@
     <string name="min_rate_label">Min Rate</string>
     <string name="average_rate_label">Average</string>
 
+    <string name="alarm_period_label">Period</string>
+    <string name="alarm_fluctuation_label">Max Fluctuation (%)</string>
+
+    <string name="default_max_fluctuation">10</string>
+
+    <string name="alarm_period_3_months_label">3 Months</string>
+    <string name="alarm_period_2_months_label">2 Months</string>
+    <string name="alarm_period_1_month_label">1 Month</string>
+    <string name="alarm_period_1_week_label">1 Week</string>
+    <string name="alarm_period_1_day_label">1 Day</string>
+
+    <string name="alarm_period_3_months_value">90</string>
+    <string name="alarm_period_2_months_value">60</string>
+    <string name="alarm_period_1_month_value">30</string>
+    <string name="alarm_period_1_week_value">7</string>
+    <string name="alarm_period_1_day_value">1</string>
+
     <string name="title_widget_detail">Currency Forecast</string>
 
     <string name="calculate_description">Calculate rate values on other currencies</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+
+    <string name="dialog_calc_rates_empty_value">Please enter any number to calculate all rates</string>
+    <string name="dialog_existing_alert">There is currently an alert for currency <xliff:g id="currencyFrom">%1$s</xliff:g> to <xliff:g id="rate">%2$s</xliff:g>, do you want to overwrite it?</string>
 
     <!-- Empty Weather Database -->
     <string name="empty_forex_list">No Rates Information Available</string>
@@ -111,11 +133,17 @@
     <!-- Strings related to Settings -->
 
     <!-- Strings related to Notification Enabled preference -->
-    <string name="pref_enable_notifications_key" translatable="false">enable_notifications</string>
-    <string name="pref_enable_notifications_label">Forex Notifications</string>
+    <string name="pref_enable_notifications_key" translatable="false">enable-notifications</string>
+    <string name="pref_enable_notifications_label">Forex Alerts</string>
     <string name="pref_enable_notifications_true">Enabled</string>
     <string name="pref_enable_notifications_false">Not Enabled</string>
     <string name="pref_enable_notifications_default" translatable="false">true</string>
+
+    <string name="pref_delete_alerts_key" translatable="false">clear-alerts</string>
+    <string name="pref_delete_alerts_label">Delete alert settings</string>
+
+    <string name="no_alert_summary">No alerts set currently.</string>
+    <string name="format_alert_summary">Currency <xliff:g id="currencyFrom">%1$s</xliff:g>-<xliff:g id="currencyTo">%2$s</xliff:g>, period <xliff:g id="days">%3$d</xliff:g> day(s) <xliff:g id="fluctuation">%4$.2f</xliff:g>%%</string>
 
     <string name="pref_sync_frequency_key">sync-frequency</string>
     <string name="pref_sync_frequency_title">Sync frequency</string>
@@ -133,6 +161,15 @@
     <!-- Key name for storing status in SharedPreferences -->
     <string name="pref_forex_status_key" translatable="false">forex-status</string>
     <string name="pref_currency_status_key" translatable="false">currency-status</string>
+
+    <string name="pref_alert_check_enabled_key" translatable="false">alert-check-enabled</string>
+    <string name="pref_alert_check_enabled_default" translatable="false">false</string>
+    <string name="pref_alert_check_currency_from_key" translatable="false">alert-check-currency-from</string>
+    <string name="pref_alert_check_currency_to_key" translatable="false">alert-check-currency-to</string>
+    <string name="pref_alert_check_period_key" translatable="false">alert-check-period</string>
+    <string name="pref_alert_check_period_default" translatable="false">30</string>
+    <string name="pref_alert_check_fluctuation_key" translatable="false">alert-check-fluctuation</string>
+    <string name="pref_alert_check_fluctuation_default" translatable="false">10</string>
 
     <string name="pref_displayed_currencies_key" translatable="false">displayed-currencies</string>
 
@@ -154,5 +191,6 @@
     <string name="pref_sync_category_label" translatable="true">Data &amp; sync</string>
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
+
 
 </resources>

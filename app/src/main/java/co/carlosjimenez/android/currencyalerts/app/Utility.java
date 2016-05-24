@@ -26,7 +26,6 @@ package co.carlosjimenez.android.currencyalerts.app;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.RectF;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
@@ -34,6 +33,7 @@ import android.text.format.Time;
 
 import java.text.SimpleDateFormat;
 
+import co.carlosjimenez.android.currencyalerts.app.data.Alert;
 import co.carlosjimenez.android.currencyalerts.app.data.Currency;
 import co.carlosjimenez.android.currencyalerts.app.sync.ForexSyncAdapter;
 import co.carlosjimenez.android.currencyalerts.app.sync.LoadCurrencyTask;
@@ -67,6 +67,44 @@ public class Utility {
     int getForexStatus(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
         return sp.getInt(c.getString(R.string.pref_forex_status_key), ForexSyncAdapter.FOREX_STATUS_UNKNOWN);
+    }
+
+    /**
+     * @param c Context used to get the SharedPreferences
+     * @return the forex sync status integer type
+     */
+    static public boolean isAlertEnabled(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        return Boolean.valueOf(sp.getString(c.getString(R.string.pref_alert_check_enabled_key),
+                c.getString(R.string.pref_alert_check_enabled_default)));
+
+    }
+
+    /**
+     * @param c Context used to get the SharedPreferences
+     * @return the forex sync status integer type
+     */
+    static public Alert getAlertSettings(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+
+        boolean enabled = sp.getBoolean(c.getString(R.string.pref_alert_check_enabled_key),
+                Boolean.valueOf(c.getString(R.string.pref_alert_check_enabled_default)));
+
+        Currency currencyFrom = new Currency();
+        currencyFrom.setId(sp.getString(c.getString(R.string.pref_alert_check_currency_from_key),
+                ""));
+
+        Currency currencyTo = new Currency();
+        currencyTo.setId(sp.getString(c.getString(R.string.pref_alert_check_currency_to_key),
+                ""));
+
+        int alarmCheckPeriod = sp.getInt(c.getString(R.string.pref_alert_check_period_key),
+                Integer.parseInt(c.getString(R.string.pref_alert_check_period_default)));
+
+        float alarmCheckFluctuation = sp.getFloat(c.getString(R.string.pref_alert_check_fluctuation_key),
+                Float.parseFloat(c.getString(R.string.pref_alert_check_fluctuation_default)));
+
+        return new Alert(enabled, currencyFrom, currencyTo, alarmCheckPeriod, alarmCheckFluctuation);
     }
 
     /**
@@ -138,7 +176,7 @@ public class Utility {
      */
     static public boolean isNetworkAvailable(Context c) {
         ConnectivityManager cm =
-                (ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null &&
@@ -205,69 +243,58 @@ public class Utility {
 
     public static int getRateFontPXSize(int length) {
         if (length <= 10)
-            return 91;
+            return 80;
         else if (length == 11)
-            return 82;
+            return 72;
         else if (length == 12)
-            return 74;
+            return 66;
         else if (length == 13)
-            return 70;
+            return 63;
         else if (length == 14)
-            return 65;
+            return 58;
         else if (length == 15)
-            return 60;
-        else if (length == 16)
-            return 55;
-        else if (length == 17)
             return 53;
+        else if (length == 16)
+            return 49;
+        else if (length == 17)
+            return 45;
         else if (length == 18)
-            return 51;
-        else if (length == 19)
-            return 47;
-        else if (length == 20)
-            return 44;
-        else if (length == 21)
-            return 43;
-        else if (length == 22)
             return 42;
+        else if (length == 19)
+            return 41;
+        else if (length == 20)
+            return 40;
+        else if (length == 21)
+            return 37;
+        else if (length == 22)
+            return 34;
         else if (length == 23)
-            return 39;
-        else if (length == 24)
-            return 36;
-        else if (length == 25)
-            return 35;
-        else if (length == 26)
-            return 35;
-        else if (length == 27)
             return 33;
-        else if (length == 28)
+        else if (length == 24)
+            return 33;
+        else if (length == 25)
             return 31;
+        else if (length == 26)
+            return 29;
+        else if (length == 27)
+            return 28;
+        else if (length == 28)
+            return 27;
         else if (length == 29)
-            return 30;
+            return 27;
         else if (length == 30)
-            return 29;
+            return 25;
         else if (length == 31)
-            return 29;
+            return 25;
         else if (length == 32)
-            return 27;
+            return 24;
         else if (length == 33)
-            return 27;
+            return 24;
         else if (length == 34)
-            return 26;
+            return 23;
         else if (length >= 35)
-            return 26;
+            return 23;
 
         return -1;
-    }
-
-    private interface SizeTester {
-        /**
-         * @param suggestedSize  Size of text to be tested
-         * @param availableSpace available space in which text must fit
-         * @return an integer < 0 if after applying {@code suggestedSize} to
-         * text, it takes less space than {@code availableSpace}, > 0
-         * otherwise
-         */
-        int onTestSize(int suggestedSize, RectF availableSpace);
     }
 }

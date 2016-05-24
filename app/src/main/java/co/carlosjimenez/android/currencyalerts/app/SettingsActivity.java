@@ -26,14 +26,18 @@ package co.carlosjimenez.android.currencyalerts.app;
 
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+
+import co.carlosjimenez.android.currencyalerts.app.data.Alert;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -47,7 +51,8 @@ import android.preference.PreferenceManager;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity
-        implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
+        implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener,
+        Preference.OnPreferenceClickListener {
 
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
 
@@ -61,6 +66,7 @@ public class SettingsActivity extends PreferenceActivity
         // updated when the preference changes.
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_sync_frequency_key)));
 
+        initDeleteAlertPreference();
     }
 
     // Registers a shared preference change listener that gets notified when preferences change
@@ -113,10 +119,60 @@ public class SettingsActivity extends PreferenceActivity
 
     }
 
+    private void initDeleteAlertPreference() {
+        Preference deleteAlertsPref = findPreference(getString(R.string.pref_delete_alerts_key));
+        deleteAlertsPref.setOnPreferenceClickListener(this);
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp.registerOnSharedPreferenceChangeListener(this);
+
+        setAlertSummary(deleteAlertsPref);
+    }
+
+    private void setAlertSummary(Preference preference) {
+        Alert alert = Utility.getAlertSettings(this);
+
+        if (alert == null || alert.getCurrencyFrom() == null || alert.getCurrencyTo() == null) {
+            return;
+        }
+
+        if (alert.isEnabled()) {
+            preference.setSummary(getString(R.string.format_alert_summary,
+                    alert.getCurrencyFrom().getId(),
+                    alert.getCurrencyTo().getId(),
+                    alert.getPeriod(),
+                    alert.getFluctuation()));
+        } else {
+            preference.setSummary(getString(R.string.no_alert_summary));
+        }
+    }
+
     // This gets called before the preference is changed
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
-        setPreferenceSummary(preference, value);
+        String stringValue = value.toString();
+
+        if (preference instanceof ListPreference) {
+            // For list preferences, look up the correct display value in
+            // the preference's 'entries' list (since they have separate labels/values).
+            ListPreference listPreference = (ListPreference) preference;
+            int prefIndex = listPreference.findIndexOfValue(stringValue);
+            if (prefIndex >= 0) {
+                preference.setSummary(listPreference.getEntries()[prefIndex]);
+            }
+        } else {
+            preference.setSummary(stringValue);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+
+        if (preference.getKey().equals(getString(R.string.pref_delete_alerts_key))) {
+                new DeleteAlertsTask(this).execute();
+        }
+
         return true;
     }
 
@@ -128,6 +184,38 @@ public class SettingsActivity extends PreferenceActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_alert_check_enabled_key)) ||
+                key.equals(getString(R.string.pref_alert_check_currency_from_key)) ||
+                key.equals(getString(R.string.pref_alert_check_currency_to_key)) ||
+                key.equals(getString(R.string.pref_alert_check_period_key)) ||
+                key.equals(getString(R.string.pref_alert_check_fluctuation_key))) {
+            setAlertSummary(findPreference(getString(R.string.pref_delete_alerts_key)));
+        }
+    }
 
+    public class DeleteAlertsTask extends AsyncTask<Void, Void, Integer> {
+
+        private final Context mContext;
+
+        public DeleteAlertsTask(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            deleteAlert(mContext);
+            return 0;
+        }
+    }
+
+    static private void deleteAlert(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.remove(c.getString(R.string.pref_alert_check_enabled_key));
+        spe.remove(c.getString(R.string.pref_alert_check_currency_from_key));
+        spe.remove(c.getString(R.string.pref_alert_check_currency_to_key));
+        spe.remove(c.getString(R.string.pref_alert_check_period_key));
+        spe.remove(c.getString(R.string.pref_alert_check_fluctuation_key));
+        spe.commit();
     }
 }

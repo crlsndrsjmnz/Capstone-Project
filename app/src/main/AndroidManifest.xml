@@ -55,7 +55,8 @@
             android:name=".DetailActivity"
             android:label="@string/title_activity_detail"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.Details">
+            android:theme="@style/AppTheme.Details"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="co.carlosjimenez.android.currencyalerts.app.MainActivity" />

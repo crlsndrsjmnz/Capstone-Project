@@ -25,5 +25,6 @@
 <resources>
     <declare-styleable name="CurrencyEditText">
         <attr name="prefix" format="string" />
+        <attr name="suffix" format="string" />
     </declare-styleable>
 </resources>

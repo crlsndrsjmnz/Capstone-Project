@@ -24,6 +24,7 @@
 
 package co.carlosjimenez.android.currencyalerts.app;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -33,6 +34,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
@@ -45,15 +47,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import co.carlosjimenez.android.currencyalerts.app.data.Alert;
+import co.carlosjimenez.android.currencyalerts.app.data.Currency;
 import co.carlosjimenez.android.currencyalerts.app.data.ForexContract;
 
 /**
@@ -64,6 +68,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private static final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
 
     static final String DETAIL_URI = "URI";
+    static final String CURRENCY_FROM = "CURRENCY_FROM";
+    static final String CURRENCY_TO = "CURRENCY_TO";
 
     // These indices are tied to FOREX_COLUMNS.  If FOREX_COLUMNS changes, these
     // must change.
@@ -123,6 +129,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private String mDisplayedCurrencyIds;
     private String mDisplayedCurrencyNames;
     private String mDisplayedRate;
+
+    private String mCurrencyFromId;
+    private String mCurrencyToId;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -187,7 +196,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                 mContext.finishAfterTransition();
                 return true;
             case R.id.action_alert:
-                Toast.makeText(mContext, "Alert", Toast.LENGTH_SHORT).show();
+                openAlertDialog();
                 return true;
         }
 
@@ -254,13 +263,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         data.moveToPosition(0);
 
-        String currencyFromId = data.getString(COL_CURRENCY_FROM_ID);
+        mCurrencyFromId = data.getString(COL_CURRENCY_FROM_ID);
         String currencyFromName = data.getString(COL_CURRENCY_FROM_NAME);
         String currencyFromSymbol = data.getString(COL_CURRENCY_FROM_SYMBOL);
         String countryFromName = data.getString(COL_COUNTRY_FROM_NAME);
         double currencyFromRate = ForexContract.RateEntry.getRateFromUri(mUri);
 
-        String currencyToId = data.getString(COL_CURRENCY_TO_ID);
+        mCurrencyToId = data.getString(COL_CURRENCY_TO_ID);
         String currencyToName = data.getString(COL_CURRENCY_TO_NAME);
         String currencyToSymbol = data.getString(COL_CURRENCY_TO_SYMBOL);
         String countryToName = data.getString(COL_COUNTRY_TO_NAME);
@@ -341,8 +350,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         mTvAverageRate.setContentDescription(mTvAverageRate.getText());
 
         // String text to share if user clicks on share menu icon
-        mDisplayedRate = String.format("%s - %s %s = %s %s", sDate, currencyFromRate, currencyFromId, currencyToRate, currencyToId);
-        mDisplayedCurrencyIds = currencyFromId + "-" + currencyToId;
+        mDisplayedRate = String.format("%s - %s %s = %s %s", sDate, currencyFromRate, mCurrencyFromId, currencyToRate, mCurrencyToId);
+        mDisplayedCurrencyIds = mCurrencyFromId + "-" + mCurrencyToId;
         mDisplayedCurrencyNames = currencyToName;
 
         mContext.supportStartPostponedEnterTransition();
@@ -374,6 +383,70 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         payload.putString(FirebaseAnalytics.Param.ITEM_NAME, currencyNames);
         payload.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "text/html");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
+    }
+
+    public void openAlertDialog() {
+        Alert alert = Utility.getAlertSettings(mContext);
+
+        if (alert == null) {
+            return;
+        }
+
+        if (alert.getCurrencyFrom() == null) {
+            FirebaseCrash.report(new Exception("Alert Currency From is NULL"));
+            return;
+        }
+
+        if (alert.getCurrencyTo() == null) {
+            FirebaseCrash.report(new Exception("Alert Currency To is NULL"));
+            return;
+        }
+
+        if (alert.isEnabled() && (!alert.getCurrencyFrom().getId().equals(mCurrencyFromId) || !alert.getCurrencyTo().getId().equals(mCurrencyToId))) {
+            openExistingAlertDialog(alert.getCurrencyFrom().getId(), alert.getCurrencyTo().getId());
+        } else {
+            openCreateAlertDialog();
+        }
+    }
+
+    private void openCreateAlertDialog() {
+        Bundle arguments = new Bundle();
+        arguments.putParcelable(DetailActivityFragment.CURRENCY_FROM, new Currency(mCurrencyFromId));
+        arguments.putParcelable(DetailActivityFragment.CURRENCY_TO, new Currency(mCurrencyToId));
+
+        AddAlertFragment fragment = new AddAlertFragment();
+        fragment.setArguments(arguments);
+
+        fragment.show(mContext.getSupportFragmentManager(), null);
+    }
+
+    private void openExistingAlertDialog(String currencyFrom, String currencyTo) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                mContext);
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage(getString(R.string.dialog_existing_alert, currencyFrom, currencyTo))
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                        openCreateAlertDialog();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
     }
 
 }

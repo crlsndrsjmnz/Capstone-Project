@@ -24,7 +24,10 @@
 
 package co.carlosjimenez.android.currencyalerts.app.data;
 
-public class Currency {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Currency implements Parcelable {
 
     private String id;
     private String name;
@@ -37,6 +40,10 @@ public class Currency {
 
     }
 
+    public Currency(String id) {
+        this.id = id;
+    }
+
     public Currency(String id, String name, String symbol, String countryCode, String countryName, String countryFlag) {
         this.id = id;
         this.name = name;
@@ -44,6 +51,15 @@ public class Currency {
         this.countryCode = countryCode;
         this.countryName = countryName;
         this.countryFlag = countryFlag;
+    }
+
+    public Currency(Parcel orig) {
+        this.id = orig.readString();
+        this.name = orig.readString();
+        this.symbol = orig.readString();
+        this.countryCode = orig.readString();
+        this.countryName = orig.readString();
+        this.countryFlag = orig.readString();
     }
 
     public String getId() {
@@ -104,5 +120,30 @@ public class Currency {
                 ", countryName='" + countryName + '\'' +
                 ", countryFlag='" + countryFlag + '\'' +
                 '}';
+    }
+
+    public static final Parcelable.Creator<Currency> CREATOR = new Parcelable.Creator<Currency>() {
+        public Currency createFromParcel(Parcel orig) {
+            return new Currency(orig);
+        }
+
+        public Currency[] newArray(int size) {
+            return new Currency[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(symbol);
+        dest.writeString(countryCode);
+        dest.writeString(countryName);
+        dest.writeString(countryFlag);
     }
 }
