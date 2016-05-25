@@ -37,28 +37,23 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 /**
- * {@link ForexAdapter} exposes a list of weather forecasts
+ * {@link ForexAdapter} exposes a list of currency rates
  * from a {@link android.database.Cursor} to a {@link android.support.v7.widget.RecyclerView}.
  */
 public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapterViewHolder> {
 
     private static final String LOG_TAG = ForexAdapter.class.getSimpleName();
 
-    private static final int VIEW_TYPE_TODAY = 0;
-    private static final int VIEW_TYPE_FUTURE_DAY = 1;
+    private static final int VIEW_TYPE_DAY = 0;
 
     final private Context mContext;
     final private ForexAdapterOnClickHandler mClickHandler;
     final private View mEmptyView;
 
-    // Flag to determine if we want to use a separate view for "today".
-    private boolean mUseTodayLayout = true;
-
     private double mMainAmount = 1;
     private double mMaxRateValue;
     private String mMaxRateSymbol;
     private String mMaxRateString;
-    private float mRateSize = 0;
 
     private Cursor mCursor;
 
@@ -79,18 +74,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
     @Override
     public ForexAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if (viewGroup instanceof RecyclerView) {
-            int layoutId = -1;
-            switch (viewType) {
-                case VIEW_TYPE_TODAY: {
-                    //layoutId = R.layout.list_item_forecast_today;
-                    break;
-                }
-                case VIEW_TYPE_FUTURE_DAY: {
-                    layoutId = R.layout.list_item_currencies;
-                    break;
-                }
-            }
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(layoutId, viewGroup, false);
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item_currencies, viewGroup, false);
             view.setFocusable(true);
             return new ForexAdapterViewHolder(view);
         } else {
@@ -102,20 +86,6 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
     public void onBindViewHolder(ForexAdapterViewHolder forexAdapterViewHolder, int position) {
         mCursor.moveToPosition(position);
 
-        int defaultImage;
-        boolean useLongToday;
-
-        switch (getItemViewType(position)) {
-            case VIEW_TYPE_TODAY:
-                defaultImage = -1;
-                //defaultImage = Utility.getArtResourceForWeatherCondition(weatherId);
-                useLongToday = true;
-                break;
-            default:
-                defaultImage = R.drawable.globe;
-                useLongToday = false;
-        }
-
         String currencyId = mCursor.getString(MainActivityFragment.COL_CURRENCY_TO_ID);
         String currencyName = mCursor.getString(MainActivityFragment.COL_CURRENCY_TO_NAME);
         String currencySymbol = mCursor.getString(MainActivityFragment.COL_CURRENCY_TO_SYMBOL);
@@ -125,7 +95,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
 
         Glide.with(mContext)
                 .load(countryFlag)
-                .error(defaultImage)
+                .error(R.drawable.globe)
                 .centerCrop()
                 .crossFade()
                 .into(forexAdapterViewHolder.mIconView);
@@ -149,10 +119,6 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
         forexAdapterViewHolder.mCurrencyRateView.setContentDescription(rateString);
     }
 
-    public void setUseTodayLayout(boolean useTodayLayout) {
-        mUseTodayLayout = useTodayLayout;
-    }
-
     public void setMaxRateVal(String maxRateSymbol, double maxRateValue) {
         this.mMaxRateSymbol = maxRateSymbol;
         this.mMaxRateValue = maxRateValue;
@@ -171,8 +137,7 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
 
     @Override
     public int getItemViewType(int position) {
-        return VIEW_TYPE_FUTURE_DAY;
-//        return (position == 0 && mUseTodayLayout) ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+        return VIEW_TYPE_DAY;
     }
 
     @Override
@@ -187,21 +152,10 @@ public class ForexAdapter extends RecyclerView.Adapter<ForexAdapter.ForexAdapter
         mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
-    public void recalculateRates(double mainCurrencyValue) {
-
-    }
-
     public Cursor getCursor() {
         return mCursor;
     }
-
-    public void selectView(RecyclerView.ViewHolder viewHolder) {
-        if (viewHolder instanceof ForexAdapterViewHolder) {
-            ForexAdapterViewHolder vfh = (ForexAdapterViewHolder) viewHolder;
-            vfh.onClick(vfh.itemView);
-        }
-    }
-
+    
     public interface ForexAdapterOnClickHandler {
         void onClick(String currencyId, String currencyName, ForexAdapterViewHolder vh);
     }

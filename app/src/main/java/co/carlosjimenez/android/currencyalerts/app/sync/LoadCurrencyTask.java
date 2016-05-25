@@ -45,6 +45,15 @@ import co.carlosjimenez.android.currencyalerts.app.Utility;
 import co.carlosjimenez.android.currencyalerts.app.data.Currency;
 import co.carlosjimenez.android.currencyalerts.app.data.ForexContract;
 
+/**
+ * This class is used to insert all the currencies located in the strings.xml and arrays.xml file, These
+ * currencies are required to be in the DB before the Sync adapter runs.
+ *
+ * <p>This load can be improved and created dynamically from information from the API, but that
+ * will be done on a future release.
+ *
+ * @see AsyncTask
+ */
 public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
 
     private static final String LOG_TAG = LoadCurrencyTask.class.getSimpleName();
@@ -65,7 +74,7 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
     }
 
     /**
-     * Sets the forex status into shared preference.  This function should not be called from
+     * Sets the currency status into shared preference.  This function should not be called from
      * the UI thread because it uses commit to write to the shared preferences.
      *
      * @param c              Context to get the PreferenceManager from.
@@ -79,11 +88,14 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
     }
 
     /**
-     * Sets the forex status into shared preference.  This function should not be called from
+     * Sets the sync currencies into shared preference.  This function should not be called from
      * the UI thread because it uses commit to write to the shared preferences.
      *
+     * <p>This preference is required for the Sync Adapter, as it will be a parameter to obtain the
+     * currency rates for the currencies listed on this string.
+     *
      * @param c              Context to get the PreferenceManager from.
-     * @param currencies     The value to set
+     * @param currencies     The list of currencies to be fetched from the API
      */
     static private void setSyncCurrencies(Context c, String currencies) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -180,6 +192,11 @@ public class LoadCurrencyTask extends AsyncTask<Void, Void, Integer> {
         return currencyRowId;
     }
 
+    /**
+     * Helper method to get the currencies from the string array
+     *
+     * @return A Vector with all the currencies found on the string array
+     */
     Vector<ContentValues> getCurrencies() {
 
         Vector<ContentValues> cVVector = new Vector<>();

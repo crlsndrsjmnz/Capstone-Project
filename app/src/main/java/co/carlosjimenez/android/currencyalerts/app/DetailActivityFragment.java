@@ -61,7 +61,7 @@ import co.carlosjimenez.android.currencyalerts.app.data.Currency;
 import co.carlosjimenez.android.currencyalerts.app.data.ForexContract;
 
 /**
- * A placeholder fragment containing a simple view.
+ * A placeholder fragment containing a detail view.
  */
 public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -158,6 +158,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             mContext.getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
+        // Ad is delayed some seconds as this affects the performance
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -369,6 +370,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
     }
 
+    /**
+     * Helper method to load the a Google Ad
+     */
     public void loadAd() {
         if (mAdView != null) {
             AdRequest adRequest = new AdRequest.Builder()
@@ -377,6 +381,12 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         }
     }
 
+    /**
+     * Helper method to send the share hit to Google Analytics
+     *
+     * @param currencyIds       String containing the currency ids
+     * @param currencyNames     String containing the currency_to name
+     */
     private void sendShareHitToAnalytics(String currencyIds, String currencyNames) {
         Bundle payload = new Bundle();
         payload.putString(FirebaseAnalytics.Param.ITEM_ID, currencyIds);
@@ -385,8 +395,12 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
     }
 
+    /**
+     * Helper method to decide if we open the create alert dialog or we show a notification
+     * that there is an alert enabled and it will be overwritten with this action.
+     */
     public void openAlertDialog() {
-        Alert alert = Utility.getAlertSettings(mContext);
+        Alert alert = Utility.getAlertSettings(mContext, false);
 
         if (alert == null) {
             return;
@@ -409,6 +423,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         }
     }
 
+    /**
+     * Helper method to open a create alert dialog
+     */
     private void openCreateAlertDialog() {
         Bundle arguments = new Bundle();
         arguments.putParcelable(DetailActivityFragment.CURRENCY_FROM, new Currency(mCurrencyFromId));
@@ -420,6 +437,12 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         fragment.show(mContext.getSupportFragmentManager(), null);
     }
 
+    /**
+     * Helper method to open a notification that there is an existing alert
+     *
+     * @param currencyFrom       String containing the currency from id
+     * @param currencyTo         String containing the currency to id
+     */
     private void openExistingAlertDialog(String currencyFrom, String currencyTo) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 mContext);

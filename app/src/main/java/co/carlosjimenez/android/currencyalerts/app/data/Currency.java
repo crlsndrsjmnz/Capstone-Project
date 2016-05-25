@@ -27,6 +27,9 @@ package co.carlosjimenez.android.currencyalerts.app.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Class that encapsulates the a Currency with all it's properties
+ */
 public class Currency implements Parcelable {
 
     private String id;
@@ -145,5 +148,35 @@ public class Currency implements Parcelable {
         dest.writeString(countryCode);
         dest.writeString(countryName);
         dest.writeString(countryFlag);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Currency currency = (Currency) o;
+
+        if (id != null ? !id.equals(currency.id) : currency.id != null) return false;
+        if (name != null ? !name.equals(currency.name) : currency.name != null) return false;
+        if (symbol != null ? !symbol.equals(currency.symbol) : currency.symbol != null)
+            return false;
+        if (countryCode != null ? !countryCode.equals(currency.countryCode) : currency.countryCode != null)
+            return false;
+        if (countryName != null ? !countryName.equals(currency.countryName) : currency.countryName != null)
+            return false;
+        return countryFlag != null ? countryFlag.equals(currency.countryFlag) : currency.countryFlag == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
+        result = 31 * result + (countryCode != null ? countryCode.hashCode() : 0);
+        result = 31 * result + (countryName != null ? countryName.hashCode() : 0);
+        result = 31 * result + (countryFlag != null ? countryFlag.hashCode() : 0);
+        return result;
     }
 }

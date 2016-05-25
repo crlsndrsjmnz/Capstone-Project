@@ -81,7 +81,8 @@ public class ForexProvider extends ContentProvider {
         sRateByCurrencyQueryBuilder = new SQLiteQueryBuilder();
 
         //This is an inner join which looks like
-        //rate INNER JOIN currency ON rate.currency_id = currency._id
+        //rate INNER JOIN currency_from ON rate.currency_from_id = currency_from.currency_id
+        //     INNER JOIN currency_to ON rate.currency_to_id = currency_to.currency_id
         sRateByCurrencyQueryBuilder.setTables(
                 ForexContract.RateEntry.TABLE_NAME +
                         " INNER JOIN " +
@@ -187,10 +188,6 @@ public class ForexProvider extends ContentProvider {
         );
     }
 
-    /*
-        Students: We've coded this for you.  We just create a new ForexDbHelper for later use
-        here.
-     */
     @Override
     public boolean onCreate() {
         mOpenHelper = new ForexDbHelper(getContext());
@@ -277,9 +274,6 @@ public class ForexProvider extends ContentProvider {
         return retCursor;
     }
 
-    /*
-        Student: Add the ability to insert Currencies to the implementation of this function.
-     */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();

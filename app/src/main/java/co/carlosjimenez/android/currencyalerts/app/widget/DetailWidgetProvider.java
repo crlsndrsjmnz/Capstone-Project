@@ -47,7 +47,7 @@ import co.carlosjimenez.android.currencyalerts.app.data.Currency;
 import co.carlosjimenez.android.currencyalerts.app.sync.ForexSyncAdapter;
 
 /**
- * Provider for a scrollable weather detail widget
+ * Provider for a scrollable currency detail widget
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DetailWidgetProvider extends AppWidgetProvider {
@@ -121,6 +121,13 @@ public class DetailWidgetProvider extends AppWidgetProvider {
                 new Intent(context, DetailWidgetRemoteViewsService.class));
     }
 
+    /**
+     * Helper method to set the main currency information on the header of the widget.
+     *
+     * @param context       Context to use for resource localization
+     * @param views         Remote Views where we set the widget information
+     * @param appWidgetIds  Ids of every widget present.
+     */
     public void setMainCurrencyDetails(Context context, @NonNull final RemoteViews views, int[] appWidgetIds) {
         Currency mainCurrency = Utility.getMainCurrency(context);
 
@@ -129,7 +136,7 @@ public class DetailWidgetProvider extends AppWidgetProvider {
 
         AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, views, R.id.widget_main_currency_flag, appWidgetIds);
 
-        Glide.with(context.getApplicationContext())
+        Glide.with(context)
                 .load(mainCurrency.getCountryFlag())
                 .asBitmap()
                 .error(R.drawable.globe)

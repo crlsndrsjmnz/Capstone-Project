@@ -24,6 +24,9 @@
 
 package co.carlosjimenez.android.currencyalerts.app.data;
 
+/**
+ * Class that encapsulates the Alert sent to the user
+ */
 public class Alert {
 
     private boolean enabled;
@@ -31,17 +34,34 @@ public class Alert {
     private Currency currencyTo;
     private int period;
     private float fluctuation;
+    private boolean clearAverage;
+    private boolean sendNotifications;
+    private double currentRate;
+    private double rateAverage;
+    private boolean positiveFluctuation;
 
     public Alert() {
 
     }
 
-    public Alert(boolean enabled, Currency currencyFrom, Currency currencyTo, int period, float fluctuation) {
+    public Alert(boolean enabled, Currency currencyFrom, Currency currencyTo, int period, float fluctuation, boolean clearAverage) {
         this.enabled = enabled;
         this.currencyFrom = currencyFrom;
         this.currencyTo = currencyTo;
         this.period = period;
         this.fluctuation = fluctuation;
+        this.clearAverage = clearAverage;
+    }
+
+    public Alert(boolean enabled, Currency currencyFrom, Currency currencyTo, int period, float fluctuation, boolean clearAverage, boolean sendNotifications, double rateAverage) {
+        this.enabled = enabled;
+        this.currencyFrom = currencyFrom;
+        this.currencyTo = currencyTo;
+        this.period = period;
+        this.fluctuation = fluctuation;
+        this.clearAverage = clearAverage;
+        this.sendNotifications = sendNotifications;
+        this.rateAverage = rateAverage;
     }
 
     @Override
@@ -52,6 +72,10 @@ public class Alert {
                 ", currencyTo=" + currencyTo +
                 ", period=" + period +
                 ", fluctuation=" + fluctuation +
+                ", clearAverage=" + clearAverage +
+                ", sendNotifications=" + sendNotifications +
+                ", currentRate=" + currentRate +
+                ", rateAverage=" + rateAverage +
                 '}';
     }
 
@@ -94,4 +118,55 @@ public class Alert {
     public void setFluctuation(float fluctuation) {
         this.fluctuation = fluctuation;
     }
+
+    public boolean isClearAverage() {
+        return clearAverage;
+    }
+
+    public void clearAverage() {
+        this.clearAverage = true;
+    }
+
+    public boolean sendNotifications() {
+        return sendNotifications;
+    }
+
+    public void setSendNotifications(boolean sendNotifications) {
+        this.sendNotifications = sendNotifications;
+    }
+
+    public double getCurrentRate() {
+        return currentRate;
+    }
+
+    public void setCurrentRate(double currentRate) {
+        this.currentRate = currentRate;
+    }
+
+    public double getRateAverage() {
+        return rateAverage;
+    }
+
+    public void setRateAverage(double rateAverage) {
+        this.rateAverage = rateAverage;
+    }
+
+    public double getCurrentFluctuation() {
+        double returnValue = -1;
+        positiveFluctuation = false;
+        if (currentRate > 0 && rateAverage > 0) {
+            returnValue = 100 - ((currentRate * 100) / rateAverage);
+
+            if (returnValue < 0) {
+                returnValue = returnValue * -1;
+                positiveFluctuation = true;
+            }
+        }
+        return returnValue;
+    }
+
+    public boolean isPositiveFluctuation() {
+        return positiveFluctuation;
+    }
+
 }

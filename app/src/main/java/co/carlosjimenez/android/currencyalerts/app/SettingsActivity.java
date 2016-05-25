@@ -40,10 +40,7 @@ import android.preference.PreferenceManager;
 import co.carlosjimenez.android.currencyalerts.app.data.Alert;
 
 /**
- * A {@link PreferenceActivity} that presents a set of application settings. On
- * handset devices, settings are presented as a single list. On tablets,
- * settings are split by category, with category headers shown to the left of
- * the list of settings.
+ * A {@link PreferenceActivity} that presents a set of application settings.
  * <p/>
  * See <a href="http://developer.android.com/design/patterns/settings.html">
  * Android Design: Settings</a> for design guidelines and the <a
@@ -119,6 +116,9 @@ public class SettingsActivity extends PreferenceActivity
 
     }
 
+    /**
+     * This method sets the listeners for the delete alert setting
+     */
     private void initDeleteAlertPreference() {
         Preference deleteAlertsPref = findPreference(getString(R.string.pref_delete_alerts_key));
         deleteAlertsPref.setOnPreferenceClickListener(this);
@@ -129,8 +129,11 @@ public class SettingsActivity extends PreferenceActivity
         setAlertSummary(deleteAlertsPref);
     }
 
+    /**
+     * This method sets the summary information for the delete alert setting
+     */
     private void setAlertSummary(Preference preference) {
-        Alert alert = Utility.getAlertSettings(this);
+        Alert alert = Utility.getAlertSettings(this, false);
 
         if (alert == null || alert.getCurrencyFrom() == null || alert.getCurrencyTo() == null) {
             return;
@@ -193,6 +196,14 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
+    /**
+     * This class is used to delete the alert settings on the shared preferences.
+     *
+     * <p>Shared preferences should not be updated on the main UI thread as it uses commit to
+     * write to the shared preferences.
+     *
+     * @see AsyncTask
+     */
     public class DeleteAlertsTask extends AsyncTask<Void, Void, Integer> {
 
         private final Context mContext;
@@ -208,6 +219,12 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
+    /**
+     * Delete the alert settings into shared preference.  This function should not be called from
+     * the UI thread because it uses commit to write to the shared preferences.
+     *
+     * @param c     Context to get the PreferenceManager from.
+     */
     static private void deleteAlert(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor spe = sp.edit();
@@ -216,6 +233,7 @@ public class SettingsActivity extends PreferenceActivity
         spe.remove(c.getString(R.string.pref_alert_check_currency_to_key));
         spe.remove(c.getString(R.string.pref_alert_check_period_key));
         spe.remove(c.getString(R.string.pref_alert_check_fluctuation_key));
+        spe.remove(c.getString(R.string.pref_alert_check_rate_average_key));
         spe.commit();
     }
 }

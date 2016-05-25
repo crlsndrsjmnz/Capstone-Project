@@ -33,6 +33,9 @@ import android.widget.EditText;
 
 import co.carlosjimenez.android.currencyalerts.app.R;
 
+/**
+ * An {@link EditText} subclass that shows a prefix, this case the currency symbol.
+ */
 public class CurrencyEditText extends EditText {
 
     private String mPrefix;

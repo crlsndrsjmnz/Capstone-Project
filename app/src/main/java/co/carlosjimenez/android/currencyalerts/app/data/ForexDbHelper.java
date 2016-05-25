@@ -32,7 +32,7 @@ import co.carlosjimenez.android.currencyalerts.app.data.ForexContract.CurrencyEn
 import co.carlosjimenez.android.currencyalerts.app.data.ForexContract.RateEntry;
 
 /**
- * Manages a local database for weather data.
+ * Manages a local database for currency and rates data.
  */
 public class ForexDbHelper extends SQLiteOpenHelper {
 
@@ -46,8 +46,8 @@ public class ForexDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        // Create a table to hold currencies.  A currency consists of the string supplied in the
-        // currency setting, the city name, and the latitude and longitude
+        // Create a table to hold currencies.  A currency consists of the currency id, name, symbol
+        // and the country info such as code, name and flag url
         final String SQL_CREATE_CURRENCY_TABLE = "CREATE TABLE " + CurrencyEntry.TABLE_NAME + " (" +
                 CurrencyEntry._ID + " INTEGER PRIMARY KEY," +
                 CurrencyEntry.COLUMN_CURRENCY_ID + " TEXT UNIQUE NOT NULL, " +
@@ -60,8 +60,8 @@ public class ForexDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_RATE_TABLE = "CREATE TABLE " + RateEntry.TABLE_NAME + " (" +
                 // Why AutoIncrement here, and not above?
-                // Unique keys will be auto-generated in either case.  But for rate
-                // forecasting, it's reasonable to assume the user will want information
+                // Unique keys will be auto-generated in either case.  But for rates
+                // it's reasonable to assume the user will want information
                 // for a certain date and all dates *following*, so the forecast data
                 // should be sorted accordingly.
                 RateEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -72,7 +72,7 @@ public class ForexDbHelper extends SQLiteOpenHelper {
                 RateEntry.COLUMN_RATE_DATE + " INTEGER NOT NULL, " +
                 RateEntry.COLUMN_RATE_VALUE + " REAL NOT NULL, " +
 
-                // Set up the currency column as a foreign key to currency table.
+                // Set up the currency from and to columns as a foreign keys to currency table.
                 " FOREIGN KEY (" + RateEntry.COLUMN_RATE_FROM_KEY + ") REFERENCES " +
                 CurrencyEntry.TABLE_NAME + " (" + CurrencyEntry.COLUMN_CURRENCY_ID + "), " +
 

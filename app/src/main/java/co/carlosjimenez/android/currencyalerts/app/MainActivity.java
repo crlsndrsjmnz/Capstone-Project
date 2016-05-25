@@ -34,6 +34,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
+/**
+ * Activity for the main view UI
+ */
 public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback {
 
     public static final String LOG_TAG = MainActivity.class.getSimpleName();

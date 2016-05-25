@@ -46,7 +46,10 @@ import co.carlosjimenez.android.currencyalerts.app.data.Alert;
 import co.carlosjimenez.android.currencyalerts.app.data.Currency;
 
 /**
- * Created by carlosjimenez on 5/23/16.
+ * Fragment that appears as a dialog and shows the options to set an alert for the
+ * specified currencies.
+ *
+ * <p/>Created by carlosjimenez on 5/23/16.
  */
 public class AddAlertFragment extends DialogFragment {
 
@@ -62,16 +65,6 @@ public class AddAlertFragment extends DialogFragment {
 
     Currency mCurrencyFrom;
     Currency mCurrencyTo;
-
-    Listener mListener;
-
-    public void setListener(Listener l) {
-        mListener = l;
-    }
-
-    public interface Listener {
-        void onFollowRequested(String userEmail);
-    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -95,9 +88,16 @@ public class AddAlertFragment extends DialogFragment {
         // Apply the adapter to the spinner
         mSpPeriod.setAdapter(adapter);
 
-        alertValues = Utility.getAlertSettings(getContext());
-        setSelectedPeriod(String.valueOf(alertValues.getPeriod()));
-        mTvFluctuation.setText(String.valueOf(alertValues.getFluctuation()));
+        alertValues = Utility.getAlertSettings(getContext(), false);
+
+        if (alertValues.getCurrencyFrom().equals(mCurrencyFrom) &&
+                alertValues.getCurrencyTo().equals(mCurrencyTo)) {
+            setSelectedPeriod(String.valueOf(alertValues.getPeriod()));
+            mTvFluctuation.setText(String.valueOf(alertValues.getFluctuation()));
+        } else {
+            alertValues = Utility.getAlertSettings(getContext(), true);
+            alertValues.clearAverage();
+        }
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
@@ -151,6 +151,14 @@ public class AddAlertFragment extends DialogFragment {
         mSelectedPeriod = getResources().getStringArray(R.array.alarm_period_values)[position];
     }
 
+    /**
+     * This class is used to update the alert settings on the shared preferences.
+     *
+     * <p>Shared preferences should not be updated on the main UI thread as it uses commit to
+     * write to the shared preferences.
+     *
+     * @see AsyncTask
+     */
     public class UpdateAlarmTask extends AsyncTask<Alert, Void, Integer> {
 
         private final Context mContext;
@@ -161,24 +169,19 @@ public class AddAlertFragment extends DialogFragment {
 
         @Override
         protected Integer doInBackground(Alert... params) {
-            setAlarmSettings(mContext, params[0]);
+            setAlertSettings(mContext, params[0]);
             return 0;
-        }
-
-        @Override
-        protected void onPostExecute(Integer response) {
-
         }
     }
 
     /**
-     * Sets the forex status into shared preference.  This function should not be called from
+     * Sets the alert settings into shared preference.  This function should not be called from
      * the UI thread because it uses commit to write to the shared preferences.
      *
-     * @param c              Context to get the PreferenceManager from.
-     * @param alert          The value to set
+     * @param c     Context to get the PreferenceManager from.
+     * @param alert Alert settings to be stored.
      */
-    private void setAlarmSettings(Context c, Alert alert) {
+    private void setAlertSettings(Context c, Alert alert) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor spe = sp.edit();
         spe.putBoolean(c.getString(R.string.pref_alert_check_enabled_key), alert.isEnabled());
@@ -186,6 +189,11 @@ public class AddAlertFragment extends DialogFragment {
         spe.putString(c.getString(R.string.pref_alert_check_currency_to_key), alert.getCurrencyTo().getId());
         spe.putInt(c.getString(R.string.pref_alert_check_period_key), alert.getPeriod());
         spe.putFloat(c.getString(R.string.pref_alert_check_fluctuation_key), alert.getFluctuation());
+
+        if (alert.isClearAverage()) {
+            spe.remove(c.getString(R.string.pref_alert_check_rate_average_key));
+        }
+
         spe.commit();
     }
 

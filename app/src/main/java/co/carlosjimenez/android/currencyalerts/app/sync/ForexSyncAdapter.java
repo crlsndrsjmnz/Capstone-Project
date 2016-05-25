@@ -59,6 +59,7 @@ import java.util.Vector;
 
 import co.carlosjimenez.android.currencyalerts.app.R;
 import co.carlosjimenez.android.currencyalerts.app.Utility;
+import co.carlosjimenez.android.currencyalerts.app.data.Alert;
 import co.carlosjimenez.android.currencyalerts.app.data.ForexContract;
 
 public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
@@ -77,6 +78,9 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final int FOREX_STATUS_UNKNOWN = 3;
     public static final int FOREX_STATUS_INVALID = 4;
+
+    private Alert mAlertData;
+    private double mCurrentAlertRate;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({FOREX_STATUS_OK, FOREX_STATUS_SERVER_DOWN, FOREX_STATUS_SERVER_INVALID, FOREX_STATUS_UNKNOWN, FOREX_STATUS_INVALID})
@@ -159,10 +163,6 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private static void onAccountCreated(Account newAccount, Context context) {
-        /*
-         * Since we've created an account
-         */
-
         // Interval at which to sync with the rates, in seconds.
         // 60 seconds (1 minute) * 180 = 3 hours
         int syncFrequency = Utility.getSyncFrequency(context);
@@ -229,8 +229,10 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
         String forexJsonStr = null;
 
         try {
+            mAlertData = Utility.getAlertSettings(getContext(), false);
+
             // Construct the URL for the OpenWeatherMap query
-            // Possible parameters are available at OWM's forex API page, at
+            // Possible parameters are available at currencyconverterapi API page.
             final String FOREX_BASE_URL = "http://free.currencyconverterapi.com/api/v3/convert?";
             final String QUERY_PARAM = "q";
             String currencyQueryStr = Utility.getSyncCurrencies(getContext());
@@ -321,8 +323,13 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
         final String OWM_RATE_TO = "to";
         final String OWM_RATE = "val";
         String[] currencies;
+        boolean alertAvailable = false;
 
         try {
+            if (mAlertData != null && mAlertData.getCurrencyFrom() != null && mAlertData.getCurrencyTo() != null) {
+                alertAvailable = true;
+            }
+
             JSONObject forexJson = new JSONObject(forexJsonStr);
 
             // do we have an error?
@@ -370,7 +377,11 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
                 forexValues.put(ForexContract.RateEntry.COLUMN_RATE_DATE, dateTime);
                 forexValues.put(ForexContract.RateEntry.COLUMN_RATE_VALUE, result);
 
-                Log.v(LOG_TAG, "Forex entry: 1 " + rate_from + " -> " + rate_to + " = " + result);
+                if (alertAvailable &&
+                        mAlertData.getCurrencyFrom().getId().equals(rate_from) &&
+                        mAlertData.getCurrencyTo().getId().equals(rate_to)) {
+                    mCurrentAlertRate = result;
+                }
 
                 cVVector.add(forexValues);
             }
@@ -387,13 +398,13 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
                         ForexContract.RateEntry.COLUMN_RATE_DATE + " <= ?",
                         new String[]{Long.toString(dayTime.setJulianDay(julianDate - FOREX_DAYS_TO_KEEP))});
 
-//                updateWidgets();
+                setForexSyncDate(getContext(), System.currentTimeMillis());
+                sendSyncBroadcast(FOREX_STATUS_OK);
+                checkCurrencyData();
             }
 
-            Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
+            Log.d(LOG_TAG, "ForexSyncAdapter: Sync Complete. " + cVVector.size() + " Inserted");
             setForexStatus(getContext(), FOREX_STATUS_OK);
-            setForexSyncDate(getContext(), System.currentTimeMillis());
-            sendSyncBroadcast(FOREX_STATUS_OK);
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -402,6 +413,11 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    /**
+     * Send sync broadcast so App and Widget can update the rate values immediately.
+     *
+     * @param status Status of the rate sync
+     */
     private void sendSyncBroadcast(int status) {
         Context context = getContext();
 
@@ -412,18 +428,12 @@ public class ForexSyncAdapter extends AbstractThreadedSyncAdapter {
         LocalBroadcastManager.getInstance(context).sendBroadcast(dataUpdatedIntent);
     }
 
-
-    private void validateRateIncrease() {
-        // If there is an alert and the notification is enabled validate rate increase.
-
-        // Validate rate percentage increase against the one on the shared preferences
-
-        // Shared preferences average should be recalculated when the sync day != current day
-
-        // We have to get all rates for that currency and calculate the average.
+    /**
+     * This method request the Alert Service to run and validate the data to see if it needs
+     * to alert the user about any currency rise or fall.
+     */
+    private void checkCurrencyData() {
+        AlertService.startAlertService(getContext(), mCurrentAlertRate);
     }
 
-    private void notifyUser() {
-        // Send Alert to the user about increase on the rate if the notification setting is activated
-    }
 }

@@ -170,6 +170,8 @@
     <string name="pref_alert_check_period_default" translatable="false">30</string>
     <string name="pref_alert_check_fluctuation_key" translatable="false">alert-check-fluctuation</string>
     <string name="pref_alert_check_fluctuation_default" translatable="false">10</string>
+    <string name="pref_alert_check_rate_average_key" translatable="false">alert-check-rate-average</string>
+    <string name="pref_alert_check_rate_average_default" translatable="false">-1</string>
 
     <string name="pref_displayed_currencies_key" translatable="false">displayed-currencies</string>
 
@@ -192,5 +194,10 @@
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
 
+    <string name="notification_title">Currency Alert</string>
+    <string name="notification_text"><xliff:g id="currencyFrom">%1$s</xliff:g> against <xliff:g id="currencyTo">%2$s</xliff:g> has gone <xliff:g id="fluctuationStatus">%3$s</xliff:g> by <xliff:g id="fluctuationValue">%4$.2f</xliff:g>%%</string>
+
+    <string name="notification_positive_fluctuation">up</string>
+    <string name="notification_negative_fluctuation">down</string>
 
 </resources>

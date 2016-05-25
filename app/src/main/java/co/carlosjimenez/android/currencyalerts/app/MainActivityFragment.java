@@ -124,9 +124,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @BindView(R.id.adView)
     AdView mAdView;
 
-//    @BindView(R.id.header_cover)
-//    ImageView mCoverImageView;
-
     private AppCompatActivity mContext;
     private FloatingActionButton mCalculateButton;
     private ForexAdapter mForexAdapter;
@@ -136,7 +133,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private final Handler mHandler = new Handler();
     private static final int AD_DELAY_MILLISECONDS = 1000;
 
-    // handler for received Intents for the "my-event" event
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -236,11 +232,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             }
         });
 
-        LoadCurrencyTask forexTask = new LoadCurrencyTask(mContext);
-        forexTask.execute();
+        new LoadCurrencyTask(mContext).execute();
 
         ForexSyncAdapter.initializeSyncAdapter(mContext);
 
+        // Ad is delayed some seconds as this affects the performance
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -268,7 +264,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onResume() {
         super.onResume();
-
         LocalBroadcastManager.getInstance(mContext).registerReceiver(mMessageReceiver,
                 new IntentFilter(ForexSyncAdapter.ACTION_DATA_UPDATED));
 
@@ -376,6 +371,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         getLoaderManager().restartLoader(FOREX_LOADER, null, this);
     }
 
+    /**
+     * Helper method to obtain the main currency from the shared preferences and set the information
+     * on the top frame.
+     */
     public void loadMainCurrencyDetails() {
         mCurrencyEditText.setPrefix(mMainCurrency.getSymbol());
         mCurrencyEditText.setSelection(mCurrencyEditText.getText().length());
@@ -404,10 +403,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mImageView.setContentDescription(mMainCurrency.getName());
     }
 
-    /*
-    Updates the empty list view with contextually relevant information that the user can
-    use to determine why they aren't seeing currency rates.
-    */
+    /**
+     * Updates the empty list view with contextually relevant information that the user can
+     * use to determine why they aren't seeing currency rates.
+     */
     private void updateEmptyView() {
         if (mForexAdapter.getItemCount() == 0) {
             if (null != mTvEmptyView) {
@@ -434,13 +433,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         }
     }
 
+    /**
+     * Method to set the position of the FAB button according to the material design guidelines.
+     */
     private void addFloatingActionButton() {
         final int fabSize = getResources().getDimensionPixelSize(R.dimen.size_fab);
         final int spacingDouble = getResources().getDimensionPixelSize(R.dimen.spacing_double);
 
-        //int bottomOfQuestionView = mCoordinatorLayout.getBottom();
         int bottomOfToolbar = mAppBarLayout.getBottom();
-        //int widthOfToolbar = mToolbar.getWidth();
 
         final CoordinatorLayout.LayoutParams fabLayoutParams = new CoordinatorLayout.LayoutParams(fabSize, fabSize);
         fabLayoutParams.gravity = Gravity.END | Gravity.TOP;
@@ -458,6 +458,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mCoordinatorLayout.addView(mCalculateButton, fabLayoutParams);
     }
 
+    /**
+     * Method to create a new FAB button.
+     */
     private void getCalculateButton() {
         if (null == mCalculateButton) {
             mCalculateButton = new FloatingActionButton(mContext);
@@ -476,6 +479,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         calculateRates();
     }
 
+    /**
+     * Method that handles the calculation of the rate when the user click on the FAB or the
+     * keyboard go buttons.
+     */
     public void calculateRates() {
         if (mForexAdapter == null || mForexAdapter.getItemCount() == 0) {
             showErrorMessage(getString(R.string.empty_forex_list));
@@ -491,6 +498,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         hideIme();
     }
 
+    /**
+     * Helper method to show errors on a snack bar.
+     *
+     * @param message message to show to the user
+     */
     private void showErrorMessage(String message) {
         Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG)
                 .setAction("Refresh", new View.OnClickListener() {
@@ -501,6 +513,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 }).show();
     }
 
+    /**
+     * Helper method to show errors on an alert dialog.
+     */
     private void showAlertMessage() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
 
@@ -520,6 +535,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         alertDialog.show();
     }
 
+    /**
+     * This method forces the soft keyboard to hide
+     */
     private void hideIme() {
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
         //Find the currently focused view, so we can grab the correct window token from it.
@@ -531,12 +549,22 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    /**
+     * Helper method to load a Google Ad
+     */
     private void loadAd() {
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
         mAdView.loadAd(adRequest);
     }
 
+    /**
+     * Helper method to send the hit to Google Analytics of a selected currency to be
+     * displayed on the detail screen
+     *
+     * @param currencyId       String containing the currency id
+     * @param currencyName     String containing the currency name
+     */
     private void sendHitToAnalytics(String currencyId, String currencyName) {
         Bundle payload = new Bundle();
         payload.putString(FirebaseAnalytics.Param.ITEM_ID, currencyId);

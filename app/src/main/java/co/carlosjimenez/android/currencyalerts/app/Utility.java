@@ -46,8 +46,10 @@ public class Utility {
     public static final String DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the currency load status integer type
+     * Helper method to obtain the Currency Sync Status from the Shared Preferences
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          the currency sync status, integer type
      */
     @SuppressWarnings("ResourceType")
     static public
@@ -58,8 +60,10 @@ public class Utility {
     }
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the forex sync status integer type
+     * Helper method to obtain the Rates Sync Status from the Shared Preferences
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          the rates sync status, integer type
      */
     @SuppressWarnings("ResourceType")
     static public
@@ -70,46 +74,90 @@ public class Utility {
     }
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the forex sync status integer type
+     * Helper method to check on the Shared Preferences if the alerts are enabled
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          true if the alert are enabled
      */
     static public boolean isAlertEnabled(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-        return Boolean.valueOf(sp.getString(c.getString(R.string.pref_alert_check_enabled_key),
-                c.getString(R.string.pref_alert_check_enabled_default)));
-
+        return sp.getBoolean(c.getString(R.string.pref_alert_check_enabled_key),
+                Boolean.valueOf(c.getString(R.string.pref_alert_check_enabled_default)));
     }
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the forex sync status integer type
+     * Helper method to obtain the Alert Settings from the Shared Preferences.
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @param defaults  if true, it will only return the default values on Shared Preferences
+     * @return          the alert settings, Alert type
      */
-    static public Alert getAlertSettings(Context c) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-
-        boolean enabled = sp.getBoolean(c.getString(R.string.pref_alert_check_enabled_key),
-                Boolean.valueOf(c.getString(R.string.pref_alert_check_enabled_default)));
+    static public Alert getAlertSettings(Context c, boolean defaults) {
+        boolean enabled;
+        int alarmCheckPeriod;
+        float alarmCheckFluctuation;
+        boolean sendNotifications;
+        double averageRate;
 
         Currency currencyFrom = new Currency();
-        currencyFrom.setId(sp.getString(c.getString(R.string.pref_alert_check_currency_from_key),
-                ""));
-
         Currency currencyTo = new Currency();
-        currencyTo.setId(sp.getString(c.getString(R.string.pref_alert_check_currency_to_key),
-                ""));
 
-        int alarmCheckPeriod = sp.getInt(c.getString(R.string.pref_alert_check_period_key),
-                Integer.parseInt(c.getString(R.string.pref_alert_check_period_default)));
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 
-        float alarmCheckFluctuation = sp.getFloat(c.getString(R.string.pref_alert_check_fluctuation_key),
-                Float.parseFloat(c.getString(R.string.pref_alert_check_fluctuation_default)));
+        if (defaults) {
 
-        return new Alert(enabled, currencyFrom, currencyTo, alarmCheckPeriod, alarmCheckFluctuation);
+            enabled = Boolean.valueOf(c.getString(R.string.pref_alert_check_enabled_default));
+            currencyFrom.setId("");
+            currencyTo.setId("");
+            alarmCheckPeriod = Integer.parseInt(c.getString(R.string.pref_alert_check_period_default));
+            alarmCheckFluctuation = Float.parseFloat(c.getString(R.string.pref_alert_check_fluctuation_default));
+            sendNotifications = false;
+            averageRate = -1;
+
+        } else {
+
+            enabled = sp.getBoolean(c.getString(R.string.pref_alert_check_enabled_key),
+                    Boolean.valueOf(c.getString(R.string.pref_alert_check_enabled_default)));
+
+            currencyFrom.setId(sp.getString(c.getString(R.string.pref_alert_check_currency_from_key),
+                    ""));
+
+            currencyTo.setId(sp.getString(c.getString(R.string.pref_alert_check_currency_to_key),
+                    ""));
+
+            alarmCheckPeriod = sp.getInt(c.getString(R.string.pref_alert_check_period_key),
+                    Integer.parseInt(c.getString(R.string.pref_alert_check_period_default)));
+
+            alarmCheckFluctuation = sp.getFloat(c.getString(R.string.pref_alert_check_fluctuation_key),
+                    Float.parseFloat(c.getString(R.string.pref_alert_check_fluctuation_default)));
+
+            sendNotifications = sp.getBoolean(c.getString(R.string.pref_enable_notifications_key),
+                    Boolean.valueOf(c.getString(R.string.pref_enable_notifications_default)));
+
+            averageRate = Double.parseDouble(sp.getString(c.getString(R.string.pref_alert_check_rate_average_key),
+                    c.getString(R.string.pref_alert_check_rate_average_default)));
+        }
+
+        return new Alert(enabled, currencyFrom, currencyTo, alarmCheckPeriod, alarmCheckFluctuation, false, sendNotifications, averageRate);
     }
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the forex sync status integer type
+     * Helper method to obtain the Rate Average from the Shared Preferences.
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          the rate average, double type
+     */
+    static public double getRateAverage(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        return Double.parseDouble(sp.getString(c.getString(R.string.pref_alert_check_rate_average_key),
+                c.getString(R.string.pref_alert_check_rate_average_default)));
+    }
+
+    /**
+     * Helper method to obtain the Sync Frequency from the Shared Preferences.
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          the forex sync frequency, integer type
      */
     static public int getSyncFrequency(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -117,8 +165,10 @@ public class Utility {
     }
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the forex sync status integer type
+     * Helper method to obtain the Forex Sync Date from the Shared Preferences.
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          the forex sync date, long type
      */
     static public long getForexSyncDate(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -136,8 +186,10 @@ public class Utility {
     }
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the forex sync status integer type
+     * Helper method to obtain the Forex Sync Datetime from the Shared Preferences.
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          the forex sync datetime, long type
      */
     static public long getForexSyncDateTime(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -145,8 +197,10 @@ public class Utility {
     }
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the forex sync status integer type
+     * Helper method to obtain the currencies to be synced from the Shared Preferences.
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          the currencies to be synced, String type
      */
     static public String getSyncCurrencies(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -154,8 +208,10 @@ public class Utility {
     }
 
     /**
-     * @param c Context used to get the SharedPreferences
-     * @return the forex sync status integer type
+     * Helper method to obtain the main currency from the Shared Preferences.
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          the main currency, Currency type
      */
     static public Currency getMainCurrency(Context c) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -169,10 +225,22 @@ public class Utility {
     }
 
     /**
+     * Helper method to check on the Shared Preferences if notifications are enabled.
+     *
+     * @param c         Context used to get the SharedPreferences
+     * @return          true if notifications are enabled
+     */
+    static public boolean isNotificationsEnabled(Context c) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        return sp.getBoolean(c.getString(R.string.pref_enable_notifications_key),
+                Boolean.valueOf(c.getString(R.string.pref_enable_notifications_default)));
+    }
+
+    /**
      * Returns true if the network is available or about to become available.
      *
-     * @param c Context used to get the ConnectivityManager
-     * @return true if the network is available
+     * @param c         Context used to get the ConnectivityManager
+     * @return          true if the network is available
      */
     static public boolean isNetworkAvailable(Context c) {
         ConnectivityManager cm =
@@ -184,8 +252,8 @@ public class Utility {
     }
 
     /**
-     * Helper method to convert the database representation of the date into something to display
-     * to users.  As classy and polished a user experience as "20140102" is, we can do better.
+     * Helper method to convert a date into something to display to users.  As classy
+     * and polished a user experience as "2014/01/02" is, we can do better.
      *
      * @param context      Context to use for resource localization
      * @param dateInMillis The date in milliseconds
@@ -197,8 +265,8 @@ public class Utility {
     }
 
     /**
-     * Helper method to convert the database representation of the date into something to display
-     * to users.  As classy and polished a user experience as "20140102" is, we can do better.
+     * Helper method to convert a date into something to display to users.  As classy and
+     * polished a user experience as "2014/01/02 12:00:00" is, we can do better.
      *
      * @param context      Context to use for resource localization
      * @param dateInMillis The date in milliseconds
@@ -209,10 +277,25 @@ public class Utility {
         return dateFormat.format(dateInMillis);
     }
 
+    /**
+     * Helper method to format the description for the flag icon.
+     *
+     * @param context       Context to use for resource localization
+     * @param country_name  Name of the country to be formatted
+     * @return              A user-friendly representation of the country name.
+     */
     public static String formatCountryFlagName(Context context, String country_name) {
         return context.getString(R.string.format_country_flag_description, country_name);
     }
 
+    /**
+     * Helper method to format the currency rate.
+     *
+     * @param context       Context to use for resource localization
+     * @param currency_symbol  Currency symbol of the currency
+     * @param currencyRate  Currency value to be formatted
+     * @return              A user-friendly representation of the currency.
+     */
     public static String formatCurrencyRate(Context context, String currency_symbol, double currencyRate) {
 
         String rate = context.getString(R.string.format_currency_rate, currency_symbol, currencyRate);
@@ -241,6 +324,12 @@ public class Utility {
         return formattedRate;
     }
 
+    /**
+     * Helper method to calculate the font size of the rate according the the length
+     *
+     * @param length       Length of the string to be displayed
+     * @return             The appropriate size of the font size in pixels.
+     */
     public static int getRateFontPXSize(int length) {
         if (length <= 10)
             return 80;

@@ -27,6 +27,9 @@ package co.carlosjimenez.android.currencyalerts.app;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+/**
+ * Activity for the detail view UI
+ */
 public class DetailActivity extends AppCompatActivity {
 
     @Override
